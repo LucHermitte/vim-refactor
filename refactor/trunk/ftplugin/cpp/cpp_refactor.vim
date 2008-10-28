@@ -1,11 +1,11 @@
 "=============================================================================
-" $Id: cpp_refactor.vim 100 2008-04-16 00:36:57Z luc.hermitte $
+" $Id$
 " File:		cpp_refactor.vim                                          {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://hermitte.free.fr/vim/>
 " Version:	1.0.0
 " Created:	10th Feb 2005
-" Last Update:	$Date: 2008-04-16 02:36:57 +0200 (mer., 16 avr. 2008) $ (10th Feb 2005)
+" Last Update:	$Date$ (10th Feb 2005)
 "------------------------------------------------------------------------
 " Description:	Some refactoring oriented mappings and commands
 " 
