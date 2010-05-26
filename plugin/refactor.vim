@@ -1,10 +1,10 @@
 "=============================================================================
 " File:		refactor.vim                                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://hermitte.free.fr/vim/>
-" Version:	v0.0.3
+"		<URL:http://code.google.com/p/lh-vim/>
+" Version:	v0.0.4
 " Created:	11th Mar 2005
-" Last Update:	28th Nov 2007
+" Last Update:	08th Sep 2009
 "------------------------------------------------------------------------
 " Description:	Some refactoring oriented mappings and commands
 "
@@ -29,6 +29,14 @@
 " 	Requires: bracketing.base.vim, Vim7
 "
 " History:
+" 	v0.0.4:	31st Oct 2007 - 08th Sep 2009
+" 		* Default variable names
+" 		* Relies on lh#functors
+" 		* Extract variable can change several occurences of the
+" 		expression to the new value. Todo: take the scope into account,
+" 		support, OO attributes, global variables, local variables, ...
+" 		(filetype specific).
+"
 " 	v0.0.3:	30th Aug 2007 - 31st Oct 2007 
 " 		* :ExtractFunction can abort if options are missing
 " 		* fix is_like_EM_
@@ -69,39 +77,45 @@ set cpo&vim
 " Extracts the body of a newly factored function;
 " As an optional argument, we can give the name of the new function
 command! -range -nargs=* ExtractFunction
-      \ :call s:ExtractFunction(0, <f-args>)
-
-" Command: :PutExtractedFunction
-" Put the body of the extracted function somewhere else
-command! -nargs=0 -bang  PutExtractedFunction
-      \ :call s:PutExtractedStuff("<bang>", s:fn)
+      \ :call lh#refactor#extract_function(0, <f-args>)
 
 " Command: :ExtractVariable <variable_name>
 " Extracts an expression to a newly factored variable;
 command! -range -nargs=1 ExtractVariable
-      \ :call s:ExtractVariable(0, <f-args>)
+      \ :call lh#refactor#extract_variable(0, <f-args>)
 
-" Command: :PutExtractedVariable
-" Put the body of the extracted variable somewhere else
-command! -nargs=0 -bang  PutExtractedVariable
-      \ :call s:PutExtractedStuff("<bang>", s:variable)
 
 " Command: :ExtractType <type_name>
 " Extracts an expression to a newly factored type;
 command! -range -nargs=1 ExtractType
-      \ :call s:ExtractType(0, <f-args>)
+      \ :call lh#refactor#extract_type(0, <f-args>)
 
-" Command: :PutExtractedType
-" Put the body of the extracted type somewhere else
-command! -nargs=0 -bang  PutExtractedType
-      \ :call s:PutExtractedStuff("<bang>", s:type)
+" Command: :PutExtracted
+" Put the body of the extracted thing somewhere else
+command! -nargs=0 -bang  PutExtracted
+      \ :call lh#refactor#put_extracted_last('')
 
+vnoremap <silent> <c-x>f :call lh#refactor#extract_function(1,INPUT("Name for the function to extract: "))<cr>
 
-vnoremap <silent> <c-x>f :call <sid>ExtractFunction(1,INPUT("Name for the function to extract: "))<cr>
-vnoremap <silent> <c-x>v :call <sid>ExtractVariable(1,INPUT("Name for the variable to extract: "))<cr>
-vnoremap <silent> <c-x>t :call <sid>ExtractType(1,INPUT("Name for the type to extract"))<cr>
-nnoremap <silent> <c-x>P <c-\><c-N>:call <sid>PutExtractedLast('!')<cr>
-nnoremap <silent> <c-x>p <c-\><c-N>:call <sid>PutExtractedLast('')<cr>
+vnoremap <silent> <Plug>RefactorExtractVariable
+      \ :call lh#refactor#extract_variable(1,INPUT("Name for the variable to extract: ", lh#refactor#default_varname()))<cr>
+if !hasmapto('<Plug>RefactorExtractVariable', 'v')
+  vmap <unique> <c-x>v <Plug>RefactorExtractVariable
+endif
+vnoremap <silent> <Plug>RefactorExtractType
+      \ :call lh#refactor#extract_type(1,INPUT("Name for the type to extract: "))<cr>
+if !hasmapto('<Plug>RefactorExtractType', 'v')
+  vmap <unique> <c-x>t <Plug>RefactorExtractType
+endif
+nnoremap <Plug>RefactorPutLastUp <c-\><c-N>:call lh#refactor#put_extracted_last('!')<cr>
+if !hasmapto('<Plug>RefactorPutLastUp', 'n')
+  nmap <unique> <c-x>P <Plug>RefactorPutLastUp
+endif
+nnoremap <Plug>RefactorPutLastDown <c-\><c-N>:call lh#refactor#put_extracted_last('')<cr>
+if !hasmapto('<Plug>RefactorPutLastDown', 'n')
+  nmap <unique> <c-x>p <Plug>RefactorPutLastDown
+endif
+
 
 " Commands and mappings }}}1
 "------------------------------------------------------------------------
@@ -143,39 +157,6 @@ endfunction
 let g:refactor_EM_cpp_is_like  = "c"
 let g:refactor_EM_java_is_like = "c"
 
-function! Refactor_EV_c(part, ...)
-  if     a:part == 'assign'
-    return ' = '
-  elseif a:part == 'type'
-    return Marker_Txt('type').' '
-  elseif a:part == 'mutable'
-    return s:IsCConst(a:1)
-	  \ ? (exists('c_no_c99') ? '#define ' : 'const ')
-	  \ : ''
-  elseif a:part == 'eol'
-    return ';'
-  endif
-endfunction
-
-function! Refactor_EV_cpp(part, ...)
-  if     a:part == 'assign'
-    return ' = '
-  elseif a:part == 'type'
-    return Marker_Txt('auto').' '
-  elseif a:part == 'mutable'
-    return s:IsCConst(a:1)
-	  \ ? 'const '
-	  \ : Marker_Txt('const ')
-  elseif a:part == 'eol'
-    return ';'
-  endif
-endfunction
-
-let g:refactor_ET_cpp_is_like  = "c"
-function! Refactor_ET_c(typeName, typeDefinition)
-  return 'typedef ' . a:typeDefinition . ' ' . a:typeName . ';'
-endfunction
-
 " VimL                                                     {{{3
 function! Refactor_EM_vim(part, ...)
   if     a:part == 'begin'
@@ -184,18 +165,6 @@ function! Refactor_EM_vim(part, ...)
     return "\nendfunction\n"
   elseif a:part == 'call'
     return 's:'.RefactorH_func(a:1)
-  endif
-endfunction
-
-function! Refactor_EV_vim(part, ...)
-  if     a:part == 'assign'
-    return ' = '
-  elseif a:part == 'type'
-    return 'let '
-  elseif a:part == 'mutable'
-    return ''
-  elseif a:part == 'eol'
-    return ''
   endif
 endfunction
 
@@ -258,99 +227,6 @@ function! s:Option(ft, refactorKind, name, param)
       throw "refactor.vim: Please define ``".opt."()''"
     endif
   endif
-endfunction
-
-
-" Refactoring lines in a new function            {{{2         -----------
-" s:ExtractFunction( [name ... signature] ) range          {{{3
-" Main function called by :ExtractFunction
-" @pre: the selection must be line-wise
-function! s:ExtractFunction(mayabort, ...) range abort
-  if a:0 == 1 && (strlen(a:1)==0) && a:mayabort
-    throw "ExtractFunction: Please specify a name for the new function"
-  endif
-  " New text to insert
-  " -- In case not every thing is configured, it will abort the extraction
-  let sig   = (a:0 == 0) ? Marker_Txt('FunctionName') : a:1
-  let call  = s:Option(&ft, 'EM', 'call',  sig)
-  let begin = s:Option(&ft, 'EM', 'begin', sig) . "\n"
-  let end   = s:Option(&ft, 'EM', 'end',   '')
-
-  try
-    let a_save = @a
-
-    " Extract what will become the body of the function
-    '<,'>delete a
-
-    " Put the call to the function in place of the code extracted
-    silent! put!=call
-    " Reindent
-    silent! normal! ==
-
-    " Prepare the function body
-    " TODO: use g:c_nl_before_curlyB / g:c_nl_before_curlyB_for_function
-    let s:fn = begin
-    let s:fn .= @a
-    if exists('b:usemarks') && b:usemarks
-      let s:fn .= "\n" . Marker_Txt()
-    endif
-    let s:fn .= end
-
-    let s:last_refactor='fn'
-
-  finally
-    " Restaure the register @a
-    let @a = a_save
-  endtry
-endfunction
-
-" Refactoring expression in a new variable       {{{2         -----------
-" s:ExtractVariable( [name] ) range                        {{{3
-" Main function called by :ExtractFunction
-" @pre: the selection is not expected to be line-wise
-function! s:ExtractVariable(mayabort, variableName) range abort
-  if a:0 == 1 && (strlen(a:1)==0) && a:mayabort
-    throw "ExtractVariable: Please specify a name for the new variable"
-  endif
-  let assign  = s:Option(&ft, 'EV', 'assign',   a:variableName)
-  let type    = s:Option(&ft, 'EV', 'type',     a:variableName)
-  let mutable = s:Option(&ft, 'EV', 'mutable',  a:variableName)
-  let eol     = s:Option(&ft, 'EV', 'eol',  	a:variableName)
-
-  try
-    let a_save = @a
-
-    " Extract the selected expression into register @a
-    exe "normal! gv\"ac".a:variableName
-    let s:variable = mutable . type . a:variableName . assign . @a . eol
-    let s:last_refactor='variable'
-  finally
-    " Restaure the register @a
-    let @a = a_save
-  endtry
-endfunction
-
-
-" Extract a type                                 {{{2         -----------
-" s:ExtractType( [name] ) range                        {{{3
-" Main function called by :ExtractFunction
-" @pre: the selection is not expected to be line-wise
-function! s:ExtractType(mayabort, typeName) range abort
-  if a:0 == 1 && (strlen(a:1)==0) && a:mayabort
-    throw "ExtractVariable: Please specify a name for the new type"
-  endif
-
-  try
-    let a_save = @a
-
-    " Extract the selected text into register @a
-    exe "normal! gv\"ac".a:typeName
-    let s:type = s:Option(&ft, 'ET', a:typeName, @a)
-    let s:last_refactor='type'
-  finally
-    " Restaure the register @a
-    let @a = a_save
-  endtry
 endfunction
 
 
