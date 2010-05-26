@@ -1,0 +1,15 @@
+			  --------------------
+			   lh-refactor v0.1.0
+			  --------------------
+
+Generic refactoring plugin for Vim
+
+Audience      : Developpers who use Vim.
+Requirements  : Vim 7, lh-vim-lib v2.2.0 ; lh-cpp when working in C++
+Required by   : n/a
+Maintainer    : Luc Hermitte
+License       : GPL 2 (see http://www.gnu.org/licenses/gpl.txt)
+More Help At  : http://code.google.com/p/lh-vim/wiki/lhRefactor
+Vim script#???: http://www.vim.org/scripts/script.php?script_id=???
+Repository    :
+	svn checkout http://lh-vim.googlecode.com/svn/refactor/trunk refactor

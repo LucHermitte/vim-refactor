@@ -1,0 +1,449 @@
+*refactor.txt*          Language independent refactoring helpers (v0.1.0)
+*refactor.vim*          For Vim version 7.x.    Last change: $Date$
+
+                        By Luc Hermitte
+                        hermitte {at} free {dot} fr
+
+
+==============================================================================
+CONTENTS                                    *refactor-contents*           {{{1
+|refactor-presentation|         Presentation
+
+  |refactor-extract-method|     Extract-Method
+  |refactor-extract-type|       Extract-Type
+  |refactor-extract-variable|   Extract-Variable
+  |refactor-extract-class|      Extract-Class     (not implemented yet)
+  |refactor-encapsulate-field|  Encapsulate-Field (not implemented yet)
+
+|refactor-mappings|             New mappings for quick refactoring
+|refactor-extend|               Extending the refactorings to new filetypes
+|refactor-links|                Links of interest
+|refactor-notes|                Notes
+|add-local-help|                Instructions on installing this file
+
+
+==============================================================================
+PRESENTATION                                *refactor-presentation*       {{{1
+
+
+This plugin defines some refactoring oriented mappings and commands that applies
+to several different languages.
+The behavior of the facilities defined can be tweaked for any type of file. 
+
+This plugin should be seen as a framework aimed at refactoring in Vim.
+As it is designed to support any language, it may not be as adapted as a plugin
+specifically designed for a particular language could be. 
+
+
+==============================================================================
+EXTRACT-METHOD REFACTORING                  *refactor-extract-method*     {{{1
+
+
+This refactoring consists in extracting lines of code, lines that will be used
+as a start for a new function (/method).
+
+------------------------------------------------------------
+Typical steps to extract a function~
+1- Select the lines (in |visual-mode|) you wish to use as a start for a new
+   function
+2- Type in the command-line: |:ExtractFunction|, or trigger the mapping
+  |v_CTRL-X_f|. The lines disappear and are replaced by a function call.
+  |Markers| (/|placeholders|) may be automatically inserted in the function
+   call.
+3- Do not forget to execute |:PutExtractedFunction| (or |CTRL-X_p|) to insert
+   the body of the new function back into the code
+
+Note: only one extracted function will be remembered at a time.
+
+
+------------------------------------------------------------
+Commands for extracting functions~
+
+*:ExtractFunction* [{Name} [({arguments})]
+This command cuts the lines visually selected, and replaces them by a function
+call. The lines extracted are stored for |:PutExtractedFunction| until the next
+use of |:ExtractFunction|.
+
+The function name can be specified as the optional argument {name}. By default, a
+|marker| will be used if no name is given.
+
+After the name, we can also specify {arguments} (surrounded by brackets). At
+this point, no processing over the list of arguments is done. Specifying them
+can be useful in non typed languages, but useless and unpractical with typed
+languages. The default value for {arguments} will also be a |marker|.
+
+*:PutExtractedFunction* [!]
+This command inserts, back into the current buffer, the code previously
+extracted. The code is put back as a function. The signature of the function is
+automatically adapted to fit the language in which the code is written.
+
+The new function will be put after the current line in which the cursor is. 
+If the commanded is "banged" (!), the function will be inserted before the
+current line.
+
+
+------------------------------------------------------------
+(EM) Languages support~
+
+A few languages are already supported by the refactoring Extract-Method
+implemented in refactor.vim: C, C++, Java, Pascal, sh, VimL
+
+                                                        *refactor-EM_new-ft*
+In order to define hooks for this refactoring, the function
+|lh#refactor#fill()| shall ne used with the following arguments:
+  - "EM" (as in "Extract Method")
+  - {ft}
+  - {hook} which tells which hook we want to define
+    This refactoring expect at least the two hooks to be defined:
+    - "_call" that describes how the function call is built
+    - "_function" that describes how the extracted function definition is
+      built.
+    Both takes the parameter "_fname" in case a function name is given to
+    |:ExtractFunction|, and "_function" also takes the parameter "_body".
+
+  Simple example: sh >
+    call lh#refactor#fill('EM', 'sh', '_call', ['fcall'])
+    call lh#refactor#fill('EM', 'sh', 'fcall', lh#function#bind('v:1_._fname ." ".Marker_Txt("paramters")') )
+    call lh#refactor#fill('EM', 'sh', '_function', ['begin', '_body', 'end'])
+    call lh#refactor#fill('EM', 'sh', 'begin', [ 'fsig', 'open' ] )
+    call lh#refactor#fill('EM', 'sh', 'fsig', lh#function#bind('v:1_._fname . "()"'))
+    call lh#refactor#fill('EM', 'sh', 'open', " {\n" )
+    call lh#refactor#fill('EM', 'sh', 'end',  ['placeholder', 'close', 'placeholder'] )
+    call lh#refactor#fill('EM', 'sh', 'placeholder', lh#function#bind('Marker_Txt()'))
+    call lh#refactor#fill('EM', 'sh', 'close',  "\n}" )
+
+
+- If we want to reuse an hook defined for another filetype, we can
+  set the function |lh#refactor#inherit()|.
+  For instance, The default definitions for C++ and Java point to C hook.
+  Note: any one level of indirections is supported. i.e.: >
+    call lh#refactor#inherit('EM', 'c', 'cpp', 0)
+    call lh#refactor#inherit('EM', 'cpp', 'csharp', 0)
+< work as expected.
+
+
+Complex examples~
+- procedure/function in Pascal, with injection of user dialog results: >
+    " 1- _call entry point is componed of thwo parts
+    call lh#refactor#fill('EM', 'pascal', '_call',      ['ask_kind', 'call'])
+    " 1.1- first ask the user whether it is a procedure or a function thanks to
+    "      lh#refactor#let
+    call lh#refactor#fill('EM', 'pascal', 'ask_kind', lh#refactor#let('kind_',
+      \  "WHICH('CONFIRM', 'nature of the routine? ', 'function\nprocedure', 1)"))
+    " 1.2- then defines what replaces the code "deleted" ; as the replacement
+    "      is some active code, lh#function#bind is used
+    call lh#refactor#fill('EM', 'pascal', 'call',      
+    \ lh#function#bind("(v:1_.kind_ == 'function' ? Marker_Txt('variable').' := ' : '') . lh#refactor#hfunc(v:1_._fname).';'.Marker_Txt()", '_fname'))
+
+
+    " 2- _function entry point is made of several parts, among which _body is
+    "     already defined (as it is one of the parameters available)
+    call lh#refactor#fill('EM', 'pascal', '_function',  ['begin', '_body', 'return', 'end'])
+
+    " 2.1- "begin" expands into the kind_ (filled by "ask_kind") + the
+    "      function signature, a placeholder for variables and the keyword "begin"
+    call lh#refactor#fill('EM', 'pascal', 'begin',      ['kind_', 'SPACE', 'fsig', 'NL', 'vars', 'NL', 'k_begin', 'NL'])
+    call lh#refactor#fill('EM', 'pascal', 'vars',       lh#function#bind('Marker_Txt("var").";"'))
+    call lh#refactor#fill('EM', 'pascal', 'fsig',       lh#function#bind('lh#refactor#hfunc(v:1_._fname)'))
+    call lh#refactor#fill('EM', 'pascal', 'SPACE',      " ")
+    call lh#refactor#fill('EM', 'pascal', 'NL',         "\n")
+    call lh#refactor#fill('EM', 'pascal', 'return',     lh#function#bind("v:1_.kind_ == 'function' ? (v:1_._fname) . ' := '.Marker_Txt('value').';\n' : ''"))
+    call lh#refactor#fill('EM', 'pascal', 'end',        ['k_end', 'placeholder', 'NL'])
+    call lh#refactor#fill('EM', 'pascal', 'k_begin',    "begin")
+    call lh#refactor#fill('EM', 'pascal', 'k_end',      "end")
+    call lh#refactor#fill('EM', 'pascal', 'placeholder', lh#function#bind('Marker_Txt()'))
+
+As we can see, this specialization asks the user whether he wants to extract a
+function or a procedure. The variable is stored (in "ask_kind") for later use
+in the hooks "call", "return", and "begin")
+
+- check class name/scope in C++
+
+
+
+==============================================================================
+EXTRACT-TYPE REFACTORING                    *refactor-extract-type*       {{{1
+
+
+This refactoring consists in extracting a complex type expression in the code,
+and define a new type. 
+
+------------------------------------------------------------
+Typical steps to extract a type~
+1- Select the text (in |visual-mode|) you wish to use as a start for a new
+   type
+2- Type in the command-line: "|:ExtractType| newTypeName". The selection
+   disappears and is replaced by the new type name.
+3- Do not forget to execute |:PutExtractedType| to insert the declaration of
+   the new type back into the code
+
+Note: only one extracted type will be remembered at a time.
+
+
+------------------------------------------------------------
+Commands for extracting types~
+
+*:ExtractType* {Name}
+This command cuts the visual selection, and replaces it by a typename.
+The type expression extracted is stored for |:PutExtractedType| until the next
+use of |:ExtractType|.
+
+The type name must be specified as the argument {name}.
+
+
+*:PutExtractedType* [!]
+This command inserts, back into the current buffer, the code previously
+extracted. The code is put back as a type declaration. The declaration of the
+type is automatically adapted to fit the language in which the code is
+written.
+
+The declaration will be put after the current line in which the cursor is. If
+the commanded is "banged" (!), the declaration will be inserted before the
+current line.
+
+
+------------------------------------------------------------
+(ET) Languages support~
+
+The behavior of these commands can be tuned for various languages. See
+|refactor-extend|.
+
+In order to define hooks for this refactoring, the function
+|lh#refactor#fill()| shall ne used with the following arguments:
+  - "ET" (as in "Extract Type")
+  - {ft}
+  - {hook} which tells which hook we want to define
+    This refactoring expect at least the two hooks to be defined:
+    - "_use" that describes what replaces the extracted type
+    - "_definition" that describes how the extracted type definition is built.
+    Both takes the parameter "_typename" in case a type name is given to
+    |:ExtractType|, and "_definition" also takes the parameter
+    "_typeexpression".
+
+
+==============================================================================
+EXTRACT-VARIABLE REFACTORING               *refactor-extract-variable*    {{{1
+
+
+This refactoring consists in extracting a complex variable expression in the code,
+and define a new variable. 
+
+------------------------------------------------------------
+Typical steps to extract a variable~
+1- Select the text (in |visual-mode|) you wish to use as a start for a new
+   variable
+2- Variable in the command-line: "|:ExtractVariable| newVariableName". The selection
+   disappears and is replaced by the new variable name.
+3- Do not forget to execute |:PutExtractedVariable| to insert the declaration of
+   the new variable back into the code
+
+Note: only one extracted variable will be remembered at a time.
+
+
+------------------------------------------------------------
+Commands for extracting variables~
+
+*:ExtractVariable* {Name}
+This command cuts the visual selection, and replaces it by a variable name.
+The expression extracted is stored for |:PutExtractedVariable| until the next
+use of |:ExtractVariable|.
+
+The variable name must be specified as the argument {name}.
+
+The user is asked whether he wants to replace all other occurrences of the
+expression in the file by the variable name.
+
+*:PutExtractedVariable* [!]
+This command inserts, back into the current buffer, the code previously
+extracted. The code is put back as a variable declaration. The declaration of
+the variable is automatically adapted to fit the language in which the code is
+written.
+
+The declaration will be put after the current line in which the cursor is. If
+the commanded is "banged" (!), the declaration will be inserted before the
+current line.
+
+
+------------------------------------------------------------
+(EV) Languages support~
+
+The behavior of these commands can be tuned for various languages. See
+|refactor-extend|.
+
+In order to define hooks for this refactoring, the function
+|lh#refactor#fill()| shall ne used with the following arguments:
+  - "EV" (as in "Extract Variable")
+  - {ft}
+  - {hook} which tells which hook we want to define
+    This refactoring expect at least the two hooks to be defined:
+    - "_use" that describes what replaces the extracted type
+    - "_definition" that describes how the extracted type definition is built.
+    Both takes the parameter "_varname" in case a type name is given to
+    |:ExtractType|, and "_definition" also takes the parameter
+    "_value".
+
+
+==============================================================================
+EXTRACT-CLASS REFACTORING                   *refactor-extract-class*      {{{1
+
+Yet to be implemented
+Will be of course limited to OO Languages.
+
+(propose a way to tag the functions to completely extract, to have in both
+classes (in this case, a class may delegate its work to the other (relations
+between the classes (inheritance, composition, reference, .....))), or just keep
+it where it is) 
+
+Issues of where the code must be put (c++), ...
+
+==============================================================================
+ENCAPSULATE-FIELD REFACTORING               *refactor-encapsulate-field*  {{{1
+
+Yet to be implemented
+Will be of course limited to OO Languages.
+
+Issues of const-correctness (c++), of where the code must be put (c++), ...
+
+==============================================================================
+MAPPINGS                                    *refactor-mappings*           {{{1
+
+    *v_CTRL-X_f* ....|refactor-extract-method|
+    *v_CTRL-X_v* ....|refactor-extract-variable|
+    *v_CTRL-X_t* ....|refactor-extract-type|
+    *CTRL-X_p*   .... put back the last thing extracted after the cursor
+    *CTRL-X_P*   .... put back the last thing extracted before the cursor
+
+==============================================================================
+EXTENDING REFACTOR                          *refactor-extend*             {{{1
+
+Supporting new refactorings require the intervene on lh-refactor code.
+However, supporting new languages with the already existing refactorings is
+quite simple, as long as we are used to VimL.
+
+A specialization for a new language must be added into a |plugin|, into one's
+|.vimrc|, or into the global zone of a |ftplugin|.
+
+Each refactoring:
+- expects to define a few hook (for each supported langage) ,
+- provides data for the hooks to exploit.
+
+The list of hooks and variables exported is specified along with the
+documentation of each refactoring.  By convention, "standard" hooks and
+variables begin with an underscore.
+
+The task of specializing a refactoring for a new filetype can then be
+summarize as defining the expected hooks for each hooks that need to be
+defined.
+
+
+                                                *lh#refactor#fill()*
+Defining a new hook is done with |lh#refactor#fill()|which takes the following
+arguments:
+- the refactoring kind,
+- the filetype it applies to,
+- the hook name,
+- and how the hook expands.
+
+That last parameter is the one that requires the most attention. It can be:
+- either of |List| of other hook (names), or variables (names),  e.g. >
+  call lh#refactor#fill('EM', 'vim', '_function', ['begin', '_body_', 'end'])
+- or a replacement text, e.g. >
+  call lh#refactor#fill('EM', 'c', 'close', "\n}")
+- or a |lhvl#function|, e.g. >
+  call lh#refactor#fill('EM', 'vim', 'placeholder', lh#refactor#placeholder(''))
+  call lh#refactor#fill('EM', 'vim', 'fsig',
+       \ lh#function#bind('lh#refactor#hfunc(v:1_._fname)'))
+<
+
+                                                *refactor-hook-override*
+Hooks can be overridden. In that case the last definition is the one kept.
+This has two applications:
+- you can override any setting to your tastes in a plugin (not necessarily in
+  after/plugin/). e.g. you don't want spaces around the assign operator when
+  extracting variables in C ? >
+  call lh#refactor#fill('EV', 'c', 'assign', '=')
+- you can share most settings within anoher filetype, but not one specific
+  hook ; that's what has been done for the "type" hook of the Extract Variable
+  refactoring between C and C++: >
+  call lh#refactor#inherit('EV', 'c', 'cpp', 1)
+  call lh#refactor#fill('EV', 'c', 'type',   lh#refactor#placeholder('type', ' '))
+  " C++1x
+  call lh#refactor#fill('EV', 'cpp', 'type', lh#refactor#placeholder('auto', ' '))
+< see |lh#refactor#inherit()|.
+
+
+                                                *lh#refactor#inherit()*
+The hooks of a refactoring that have defined for one filetype that be reused
+for another filetype thanks to |lh#refactor#inherit()|. The functions takes a
+following parameters:
+- the refactoring kind,
+- the filetype inherited
+- the filetype inheriting
+- whether the hooks are shared (0), of copied (1, see |deepcopy()|)
+If a hook is shared, overiding it will override the hook for all the filetypes
+sharing it.
+
+Helper functors~
+                                                *lh#refactor#hfunc()*
+It returns its argument followed by "(«parameters»)" if its argument contains
+no open-bracket "(".
+
+                                                *lh#refactor#placeholder()*
+Returns a |lhvl#function| that returns a dynamically computed
+placeholder/|marker| thanks to |Marker_Txt()|. As it is dynamically computed,
+the placeholder characters may be changed at anytime.
+
+                                                *lh#refactor#let()#*
+Returns a |lhvl#function| that assigns a value into a variable that is made
+available to all hooks of the refactoring.
+
+
+==============================================================================
+LINKS OF INTEREST                           *refactor-links*              {{{1
+
+Klaus Horsten's tip #589 on SF: Vim as refactoring tool (with examples in C#)
+    <http://vim.wikia.com/wiki/VimTip589>
+
+Refactoring.com
+    <http://www.refactoring.com/catalog/index.html>
+
+
+Refactoring Python code in vim~
+Ropevim
+    <http://rope.sourceforge.net/ropevim.html>
+Bicycle Repair Man (that has a plugin for Vim)
+    <http://bicyclerepair.sourceforge.net/>
+
+
+==============================================================================
+NOTES                                       *refactor-notes*              {{{1
+
+Requirements~
+|lh-vim-lib| (for |lhvl#function|)
+|bracketing.base.vim| (for |Marker_Txt()|),
+
+Design notes~
+function => dynamic. i.e. the Marker-characters can be changed before
+:ExtractFunction. We can even define hooks that will ask for things (like
+function names, visibility, ...) to the end-user (with |inputdialog()| for
+instance).
+
+
+Future developments~
+lh-refactor may change the way the things inserted are built in a later
+version.  Indeed, |mu-template| already offer many feature that lh-refactor
+may take advantage of.
+
+Regarding |refactor-extract-method|, I intend to play with |tags| in order to
+extract the variables that need to be exchanged between the current scope and
+the extracted function.
+
+And of course, many other refactorings need to be implemented.
+
+
+==============================================================================
+ © Luc Hermitte, 2005-2010 <http://code.google.com/p/lh-vim/>
+ $Id$
+ VIM: let b:VS_language = 'american' 
+ vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
+ vim600:fdm=marker:
