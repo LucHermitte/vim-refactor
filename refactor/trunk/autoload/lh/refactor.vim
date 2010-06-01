@@ -3,7 +3,7 @@
 " File:		autoload/lh/refactor.vim                                 {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	0.1.0
+" Version:	0.2.0
 " Created:	31st Oct 2008
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -12,11 +12,14 @@
 " 
 "------------------------------------------------------------------------
 " Installation:
-" 	Requires Vim 7.1+, and lh-vim-lib v2.2.0+
+" 	Requires Vim 7.1+, and lh-vim-lib v2.2.1+
+" 	Takes advantage of lh-tags v0.2.2 (and ctags) and lh-dev v0.0.1 when
+" 	installed to implement a smart Extract Method refactoring.
 " 	Drop this file into {rtp}/autoload/lh
 "
 " History:	
 " 	v0.1.0 new kernel built on top of lh#function
+" 	v0.2.0 smart Extract Method refactoring
 " TODO:		
 " 	- support <++> as placeholder marks, and automatically convert them to
 " 	the current ones
@@ -79,6 +82,96 @@ function! lh#refactor#placeholder(text, ...)
   let f = lh#function#bind('Marker_Txt('.string(a:text).')'. ((a:0) ? '.'.string(a:1 ): ''))
   return f
 endfunction
+
+" EM: automagic parameters {{{3
+
+function! s:CheckUsed(variables, lines)
+  let used = []
+  for l in a:lines
+    let i = 0
+    while i < len(a:variables)
+      let v = a:variables[i]
+      if match(l, '\<'. (v.name) . '\>') != -1
+	call add(used, v)
+	call remove(a:variables, i)
+	if empty(a:variables) | return used | endif
+	break
+      endif
+      let i+= 1
+    endwhile
+  endfor
+  return used
+endfunction
+
+function! s:SearchParameters(extract_begin, extract_end)
+  try 
+    call lh#dev#start_tag_session()
+
+    " 1- Obtain function boundaries
+    let fn = lh#dev#find_function_boudaries(a:extract_begin)
+
+    " 2- Find the variables declared in the function
+    let params = [fn.lines] + a:000
+    " let lVariables = call (function('lh#dev#get_variables'),params)
+    let lVariables = lh#dev#get_variables(fn.lines, a:extract_begin, a:extract_end)
+
+    " 2.1- sort the variables extracted, the variables declared before and used
+    " by the extracted code
+    let extracted_lines = getline(a:extract_begin, a:extract_end)
+
+    let original_parameters = lh#dev#function#get_(fn.fn, 'parameters')
+    for p in original_parameters
+      let p.line = -1 " and not as this is a parameter of the original function fn.lines[0]
+    endfor
+    let before_variables    = lVariables[0] + original_parameters
+    let extracted_variables = lVariables[1]
+    let after_variables     = lVariables[2]
+
+    let required_variables = s:CheckUsed(before_variables, extracted_lines)
+
+    let after_lines = getline(a:extract_end+1, fn.lines[1])
+    let exported_variables = s:CheckUsed(copy(extracted_variables), extracted_lines)
+    " at this point, before_variables == unused_variables
+
+    " 2.2- if a return statement was extracted, forward it
+    let return_re = lh#dev#option#get('return_pattern', &ft, '\<return\>') 
+    let first_return_line = lh#list#match(extracted_lines, return_re)
+
+    " 2.3- sort the variables extracted reused after the extracted part
+    " (if more than one, propose a way to export them)
+
+    call s:Verbose("FUNCTION=".string(fn))
+    " - unused ... it speaks for itself!
+    call s:Verbose("UNUSED VARIABLES=".
+	  \ join(lh#list#transform(before_variables, [],
+	  \ '(v:1_.line) .":".(v:1_.name)'), ','))
+    " - variables that needs to be passed to the function called
+    call s:Verbose("USED VARIABLES=".
+	  \ join(lh#list#transform(required_variables, [],
+	  \ '(v:1_.line) .":".(v:1_.name)'), ','))
+    " - variables that need to be declared in the function called
+    "   unless they must be exported nothing has to be done
+    call s:Verbose("EXTRACTED VARIABLES=".
+	  \ join(lh#list#transform(extracted_variables, [],
+	  \ '(v:1_.line) .":".(v:1_.name)'), ','))
+    " - variables that need to be exported
+    " if only 1, and no return, the export may be done through return
+    call s:Verbose("EXPORTED VARIABLES=".
+	  \ join(lh#list#transform(exported_variables, [],
+	  \ '(v:1_.line) .":".(v:1_.name)'), ','))
+    " - variables that does not concern us
+    call s:Verbose("POST VARIABLES=".
+	  \ join(lh#list#transform(after_variables, [],
+	  \ '(v:1_.line) .":".(v:1_.name)'), ','))
+    " - if first_return_line != -1 && original return type != void
+    "  => must reuse the return type, if it means something to the {ft} 
+    "  =/> we can also propose to use tuples, structs, lists, ...
+    call s:Verbose("RETURN=".first_return_line.':')
+  finally
+    call lh#dev#end_tag_session()
+  endtry
+endfunction
+
 
 " ## Definitions {{{1
 
@@ -225,7 +318,13 @@ call lh#refactor#fill('ET', 'c', 'eol',          ';')
 call lh#refactor#inherit('ET', 'c', 'cpp', 1)
 
 
-" ## Functions {{{1
+" ## Misc Functions     {{{1
+" # Version                                      {{{2         -----------
+let s:k_version = 010
+function! lh#refactor#version()
+  return s:k_version
+endfunction
+
 " # Debug                                        {{{2         -----------
 function! lh#refactor#verbose(level)
   let s:verbose = a:level
@@ -298,6 +397,19 @@ function! lh#refactor#extract_function(mayabort, functionName) range abort
 
     " Extract what will become the body of the function into register @a
     '<,'>yank a
+
+    " Check about data
+    try
+      if lh#tags#ctags_is_installed()
+	call s:SearchParameters(a:firstline, a:lastline)
+      else
+	call s:Verbose("ctags is not available, the extract method will be dumb")
+      endif
+    catch /E117.*lh#tags#ctags_is_installed/
+      call s:Verbose("lh-tags is not installed, the extract method will be dumb:".v:exception)
+    catch /E117.*lh#dev#find_function_boudaries/
+      call s:Verbose("lh-dev is not installed, the extract method will be dumb:".v:exception)
+    endtry
 
     " Prepare the function body
     let params['_body'] = @a " reuse the same variable as _call may have added some data to params
