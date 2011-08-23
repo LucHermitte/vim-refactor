@@ -2,7 +2,7 @@
 " File:		refactor.vim                                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	v0.0.4
+" Version:	v0.2.2
 " Created:	11th Mar 2005
 " Last Update:	08th Sep 2009
 "------------------------------------------------------------------------
@@ -29,6 +29,8 @@
 " 	Requires: bracketing.base.vim, Vim7
 "
 " History:
+" 	v0.2.2:	Feb - 23rd Aug 2011
+" 	        * <c-x>g and <c-x>s to prepare getters and setters
 " 	v0.0.4:	31st Oct 2007 - 08th Sep 2009
 " 		* Default variable names
 " 		* Relies on lh#functors
@@ -66,7 +68,7 @@
 if exists("g:loaded_refactor") && !exists('g:force_reload_refactor')
   finish
 endif
-let g:loaded_refactor = 1
+let g:loaded_refactor = 022
 let s:cpo_save=&cpo
 set cpo&vim
 " Avoid global reinclusion }}}1
@@ -116,6 +118,14 @@ if !hasmapto('<Plug>RefactorPutLastDown', 'n')
   nmap <unique> <c-x>p <Plug>RefactorPutLastDown
 endif
 
+nnoremap <Plug>RefactorExtractGetter <c-\><c-n>:call lh#refactor#extract_getter()<cr>
+if !hasmapto('<Plug>RefactorExtractGetter', 'n')
+  nmap <unique> <c-x>g <Plug>RefactorExtractGetter
+endif
+nnoremap <Plug>RefactorExtractSetter <c-\><c-n>:call lh#refactor#extract_setter()<cr>
+if !hasmapto('<Plug>RefactorExtractSetter', 'n')
+  nmap <unique> <c-x>s <Plug>RefactorExtractSetter
+endif
 
 " Commands and mappings }}}1
 "------------------------------------------------------------------------
