@@ -1,4 +1,4 @@
-*refactor.txt*          Language independent refactoring helpers (v0.1.0)
+*refactor.txt*          Language independent refactoring helpers (v0.2.2)
 *refactor.vim*          For Vim version 7.x.    Last change: $Date$
 
                         By Luc Hermitte
@@ -12,6 +12,8 @@ CONTENTS                                    *refactor-contents*           {{{1
   |refactor-extract-method|     Extract-Method
   |refactor-extract-type|       Extract-Type
   |refactor-extract-variable|   Extract-Variable
+  |refactor-extract-getter|     Extract-Getter
+  |refactor-extract-setter|     Extract-Setter
   |refactor-extract-class|      Extract-Class     (not implemented yet)
   |refactor-encapsulate-field|  Encapsulate-Field (not implemented yet)
 
@@ -284,10 +286,64 @@ In order to define hooks for this refactoring, the function
 
 
 ==============================================================================
+EXTRACT-GETTER REFACTORING                  *refactor-extract-getter*     {{{1
+EXTRACT-SETTER REFACTORING                  *refactor-extract-setter*
+
+Thess refactorings are executed on the line where a class attribute is
+defined.  The attribute is decoded, and the definition of its getter (/resp.
+setter) is built and cached.
+
+------------------------------------------------------------
+Typical steps to extract a getter/setter~
+1- Put the cursor on the line of definition of a class attribute.
+2- Trigger the extraction with |n_CTRL-X_g| (/resp. |n_CTRL-X_s|
+3- Do not forget to execute |n_CTRL-X_p|| to insert the definition of
+   the new getter (/resp setter).
+
+Note: only one extracted getter (/resp setter) will be remembered at a time.
+These refactorings are of course restricted to OO Languages.
+
+------------------------------------------------------------
+(EG/ES) Languages support~
+
+A few languages are already supported by the refactoring Extract-Getter/Setter
+implemented in refactor.vim: C++, Java, and C#.
+
+Remarks:
+- Issues of const-correctness are taken into account in C++.
+- I'm not a Java nor C# guy. Hence attribute decoding may require some tuning
+  for those languages. LEt me know if you find any bug.
+
+The behavior of these commands can be tuned for various languages. See
+|refactor-extend|.
+
+In order to define hooks for this refactoring, the function
+|lh#refactor#fill()| shall ne used with the following arguments:
+  - "Eg" (as in "Extract Getter"), or "Es" (as in "Extract Setter")
+  - {ft}
+  - {hook} which tells which hook we want to define
+    This refactoring expect at least the following hook to be defined:
+    "_definition" that describes how the extracted accessor/mutator
+      definition is built.
+    It takes the following parameters: (this will change!)
+    - "_name"
+    - "_type"
+    - "_static"
+    - "_fname"
+    - "_args"
+    - "_instruction"
+
+==============================================================================
+ENCAPSULATE-FIELD REFACTORING               *refactor-encapsulate-field*  {{{1
+
+Yet to be implemented -- thanks to extract-setter and extract-getter
+This refactoring is of course restricted to OO Languages.
+
+==============================================================================
 EXTRACT-CLASS REFACTORING                   *refactor-extract-class*      {{{1
 
 Yet to be implemented
-Will be of course limited to OO Languages.
+This refactoring is of course restricted to OO Languages.
 
 (propose a way to tag the functions to completely extract, to have in both
 classes (in this case, a class may delegate its work to the other (relations
@@ -297,19 +353,13 @@ it where it is)
 Issues of where the code must be put (c++), ...
 
 ==============================================================================
-ENCAPSULATE-FIELD REFACTORING               *refactor-encapsulate-field*  {{{1
-
-Yet to be implemented
-Will be of course limited to OO Languages.
-
-Issues of const-correctness (c++), of where the code must be put (c++), ...
-
-==============================================================================
 MAPPINGS                                    *refactor-mappings*           {{{1
 
     *v_CTRL-X_f* ....|refactor-extract-method|
     *v_CTRL-X_v* ....|refactor-extract-variable|
     *v_CTRL-X_t* ....|refactor-extract-type|
+    *n_CTRL-X_g* ....|refactor-extract-getter|
+    *n_CTRL-X_s* ....|refactor-extract-setter|
     *CTRL-X_p*   .... put back the last thing extracted after the cursor
     *CTRL-X_P*   .... put back the last thing extracted before the cursor
 
@@ -407,6 +457,8 @@ Klaus Horsten's tip #589 on SF: Vim as refactoring tool (with examples in C#)
 Refactoring.com
     <http://www.refactoring.com/catalog/index.html>
 
+Klockwork C/C++ refactoring vim plugin
+    <http://www.klocwork.com/products/documentation/Insight-9.1/Refactoring_for_C/C%2B%2B_in_Vim>
 
 Refactoring Python code in vim~
 Ropevim
@@ -421,6 +473,7 @@ NOTES                                       *refactor-notes*              {{{1
 Requirements~
 |lh-vim-lib| (for |lhvl#function|)
 |bracketing.base.vim| (for |Marker_Txt()|),
+|lh-dev| (for various options)
 
 Design notes~
 function => dynamic. i.e. the Marker-characters can be changed before
@@ -442,7 +495,7 @@ And of course, many other refactorings need to be implemented.
 
 
 ==============================================================================
- © Luc Hermitte, 2005-2010 <http://code.google.com/p/lh-vim/>
+ © Luc Hermitte, 2005-2011 <http://code.google.com/p/lh-vim/>
  $Id$
  VIM: let b:VS_language = 'american' 
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
