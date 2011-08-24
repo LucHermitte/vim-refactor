@@ -491,13 +491,13 @@ call lh#refactor#inherit('ET', 'c', 'cpp', 1)
 " Generic definition for C++ inspired OO langages           {{{3         -----------
 " no _use in that case
 " Options: (b|g):[cpp_]refactor_getter_open, and (b|g):[cpp_]refactor_getter_close, e.g.
-" LetIfUndef g:cpp_refactor_getter_open "\n{\ "
-" LetIfUndef g:cpp_refactor_getter_close ' } '
+LetIfUndef g:java_refactor_getter_open "\ {\n"
+LetIfUndef g:java_refactor_getter_close '\n}'
 call lh#refactor#fill('Eg', '_oo_c_', '_definition',  ['signature', 'body'])
 call lh#refactor#fill('Eg', '_oo_c_', 'space',        ' ')
 call lh#refactor#fill('Eg', '_oo_c_', 'eol',          ';')
 call lh#refactor#fill('Eg', '_oo_c_', 'open',         lh#function#bind ("lh#dev#option#get('refactor_getter_open', &ft, ' { ')"))
-call lh#refactor#fill('Eg', '_oo_c_', 'close',        lh#function#bind ("lh#dev#option#get('refactor_getter_close', &ft, ' } ')"))
+call lh#refactor#fill('Eg', '_oo_c_', 'close',        lh#function#bind ("lh#dev#option#get('refactor_getter_close', &ft, '}')"))
 call lh#refactor#fill('Eg', '_oo_c_', 'return',       "return ")
 call lh#refactor#fill('Eg', '_oo_c_', 'postfix_',     "")
 call lh#refactor#fill('Eg', '_oo_c_', 'prefix_',      "")
@@ -509,7 +509,7 @@ call lh#refactor#fill('Eg', '_oo_c_', 'body',         ['open', 'return', '_name'
 " C++                                                       {{{3         -----------
 " Deep copy of the generic definition, in order to customize the result for C++
 call lh#refactor#inherit('Eg', '_oo_c_', 'cpp', 1)
-call lh#refactor#fill('Eg', 'cpp',    'rettype',      lh#function#bind('lh#cpp#types#ConstCorrectType(v:1_._type)'))
+call lh#refactor#fill('Eg', 'cpp',    'rettype',      lh#function#bind('lh#dev#cpp#types#ConstCorrectType(v:1_._type)'))
 " TODO: C++11, add nothrow()
 call lh#refactor#fill('Eg', 'cpp',    'postfix_',      " const")
 
@@ -530,8 +530,8 @@ call lh#refactor#inherit('Eg', 'java', 'cs', 0)
 " Generic definition for C++ inspired OO langages           {{{3         -----------
 " no _use in that case
 " Options: (b|g):[cpp_]refactor_setter_open, and (b|g):[cpp_]refactor_setter_close, e.g.
-" LetIfUndef g:cpp_refactor_setter_open "\n{\ "
-" LetIfUndef g:cpp_refactor_setter_close ' } '
+LetIfUndef g:java_refactor_setter_open "\ {\n"
+LetIfUndef g:java_refactor_setter_close '\n}'
 call lh#refactor#fill('Es', '_oo_c_', '_definition',  ['signature', 'body'])
 call lh#refactor#fill('Es', '_oo_c_', 'signature',    ['rettype', 'fsig', 'postfix_'])
 call lh#refactor#fill('Es', '_oo_c_', 'rettype',      ['prefix_', '_static', 'void'])
