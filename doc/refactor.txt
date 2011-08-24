@@ -14,8 +14,8 @@ CONTENTS                                    *refactor-contents*           {{{1
   |refactor-extract-variable|   Extract-Variable
   |refactor-extract-getter|     Extract-Getter
   |refactor-extract-setter|     Extract-Setter
-  |refactor-extract-class|      Extract-Class     (not implemented yet)
   |refactor-encapsulate-field|  Encapsulate-Field (not implemented yet)
+  |refactor-extract-class|      Extract-Class     (not implemented yet)
 
 |refactor-mappings|             New mappings for quick refactoring
 |refactor-extend|               Extending the refactorings to new filetypes
@@ -26,7 +26,6 @@ CONTENTS                                    *refactor-contents*           {{{1
 
 ==============================================================================
 PRESENTATION                                *refactor-presentation*       {{{1
-
 
 This plugin defines some refactoring oriented mappings and commands that applies
 to several different languages.
@@ -39,7 +38,6 @@ specifically designed for a particular language could be.
 
 ==============================================================================
 EXTRACT-METHOD REFACTORING                  *refactor-extract-method*     {{{1
-
 
 This refactoring consists in extracting lines of code, lines that will be used
 as a start for a new function (/method).
@@ -166,7 +164,6 @@ in the hooks "call", "return", and "begin")
 ==============================================================================
 EXTRACT-TYPE REFACTORING                    *refactor-extract-type*       {{{1
 
-
 This refactoring consists in extracting a complex type expression in the code,
 and define a new type. 
 
@@ -225,7 +222,6 @@ In order to define hooks for this refactoring, the function
 
 ==============================================================================
 EXTRACT-VARIABLE REFACTORING               *refactor-extract-variable*    {{{1
-
 
 This refactoring consists in extracting a complex variable expression in the code,
 and define a new variable. 
@@ -333,6 +329,17 @@ In order to define hooks for this refactoring, the function
     - "_args"
     - "_instruction"
 
+The default generation procedure uses the following parametrable functions:
+- |lh#dev#naming#variable()| to deduce the property name
+- |lh#dev#naming#getter()|   to build the getter name
+- |lh#dev#naming#setter()|   to build the setter name
+- |lh#dev#naming#param()|    to build the parameter name (forthe setter)
+and on the following options to specify how code blocks shall be inserted:
+- *(bg):{ft_}refactor_getter_open*  = ' { ' -- " {\n" for java
+- *(bg):{ft_}refactor_getter_close* = '}'   -- "\n}"  for java
+- *(bg):{ft_}refactor_setter_open*  = ' { ' -- " {\n" for java
+- *(bg):{ft_}refactor_setter_close* = '}'   -- "\n}"  for java
+
 ==============================================================================
 ENCAPSULATE-FIELD REFACTORING               *refactor-encapsulate-field*  {{{1
 
@@ -366,7 +373,7 @@ MAPPINGS                                    *refactor-mappings*           {{{1
 ==============================================================================
 EXTENDING REFACTOR                          *refactor-extend*             {{{1
 
-Supporting new refactorings require the intervene on lh-refactor code.
+Supporting new refactorings require to step into lh-refactor code.
 However, supporting new languages with the already existing refactorings is
 quite simple, as long as we are used to VimL.
 
@@ -484,12 +491,13 @@ instance).
 
 Future developments~
 lh-refactor may change the way the things inserted are built in a later
-version.  Indeed, |mu-template| already offer many feature that lh-refactor
+version.  Indeed, |mu-template| already offer many features that lh-refactor
 may take advantage of.
 
-Regarding |refactor-extract-method|, I intend to play with |tags| in order to
-extract the variables that need to be exchanged between the current scope and
-the extracted function.
+Regarding |refactor-extract-method|, I've started to play with |tags| in order
+to extract the variables that need to be exchanged between the current scope
+and the extracted function. I still have to implement an UI to present all
+those variables, and a way to the user to choose how they will be exchanged.
 
 And of course, many other refactorings need to be implemented.
 
