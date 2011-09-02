@@ -446,7 +446,7 @@ call lh#refactor#fill('EV', 'c', 'mutable',      lh#function#bind(function('lh#r
 
 call lh#refactor#inherit('EV', 'c', 'cpp', 1)
 " overide type for C++
-call lh#refactor#fill('EV', 'cpp', 'type',         lh#refactor#placeholder('auto', ' ')) " C++0x
+call lh#refactor#fill('EV', 'cpp', 'type',         lh#refactor#placeholder('auto', ' ')) " C++11
 
 
 " VimL                                                      {{{3         -----------
@@ -510,8 +510,7 @@ call lh#refactor#fill('Eg', '_oo_c_', 'body',         ['open', 'return', '_name'
 " Deep copy of the generic definition, in order to customize the result for C++
 call lh#refactor#inherit('Eg', '_oo_c_', 'cpp', 1)
 call lh#refactor#fill('Eg', 'cpp',    'rettype',      lh#function#bind('lh#dev#cpp#types#ConstCorrectType(v:1_._type)'))
-" TODO: C++11, add nothrow()
-call lh#refactor#fill('Eg', 'cpp',    'postfix_',      " const")
+call lh#refactor#fill('Eg', 'cpp',    'postfix_',      " const".(lh#dev#cpp#use_cpp11()? " noexcept" : ""))
 
 " Java                                                      {{{3         -----------
 " Deep copy of the generic definition, in order to customize the result for Java
