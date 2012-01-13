@@ -3,7 +3,7 @@
 " File:         autoload/lh/refactor.vim                                 {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://code.google.com/p/lh-vim/>
-" Version:      0.2.2
+" Version:      0.2.3
 " Created:      31st Oct 2008
 " Last Update:  $Date$
 "------------------------------------------------------------------------
@@ -12,16 +12,20 @@
 " 
 "------------------------------------------------------------------------
 " Installation:
-"       Requires Vim 7.1+, lh-vim-lib v2.2.1+, and lh-dev (for setter/getter)
+"       Requires Vim 7.1+, lh-vim-lib v2.2.1+, and lh-dev v0.0.3 (for setter/getter)
 "       Takes advantage of lh-tags v0.2.2 (and ctags) and lh-dev v0.0.1 when
 "       installed to implement a smart Extract Method refactoring.
 "       Drop this file into {rtp}/autoload/lh
 "
 " History:      
-"       v0.1.0 new kernel built on top of lh#function
-"       v0.2.0 smart Extract Method refactoring
+"       v0.1.0 New kernel built on top of lh#function
+"       v0.2.0 Smart Extract Method refactoring
 "       v0.2.1 Extract shell variables
 "       v0.2.2 Getter/Setter
+"       v0.2.3 Bug fixes in Getter/Setter
+"              New helper functions lh#refactor#snippet() and
+"              lh#refactor#opt_snippet()
+"              
 " TODO:         
 "       - support <++> as placeholder marks, and automatically convert them to
 "       the current ones
@@ -93,9 +97,24 @@ function! lh#refactor#let(varname, value)
 endfunction
 
 " lh#refactor#placeholder(text [, extra])                   {{{3
-" todo: ooption to return nothing when |b:usemarks| is false
+" todo: option to return nothing when |b:usemarks| is false
 function! lh#refactor#placeholder(text, ...)
   let f = lh#function#bind('Marker_Txt('.string(a:text).')'. ((a:0) ? '.'.string(a:1 ): ''))
+  return f
+endfunction
+
+" lh#refactor#snippet(text)                                 {{{3
+" todo: option to return nothing when |b:usemarks| is false
+function! lh#refactor#snippet(text)
+  let text = '"' . substitute(a:text, '${\(\k\{-}\)}', '".v:1_.\1."', 'g') . '"'
+  " let text = string(text)
+  let f = lh#function#bind(text)
+  return f
+endfunction
+
+function! lh#refactor#opt_snippet(option)
+  let snippet = lh#dev#option#get(a:option, &ft, '')
+  let f = lh#function#bind("lh#refactor#snippet(lh#dev#option#get(".string(a:option).", &ft, ''))")
   return f
 endfunction
 
@@ -368,6 +387,8 @@ function! lh#refactor#inherit(refactoring, ft_parent, ft_child, deepcopy)
 endfunction
 
 
+" ## Refactorings {{{1
+"
 " # Extract Method                               {{{2         -----------
 " C & familly                                               {{{3         -----------
 call lh#refactor#fill('EM', 'c', '_call', ['call'])
@@ -490,15 +511,18 @@ call lh#refactor#inherit('ET', 'c', 'cpp', 1)
 " # Extract Getter                               {{{2         -----------
 " Generic definition for C++ inspired OO langages           {{{3         -----------
 " no _use in that case
-" Options: (b|g):[cpp_]refactor_getter_open, and (b|g):[cpp_]refactor_getter_close, e.g.
+" Options: (b|g):[cpp_]refactor_getter_open, (b|g):[cpp_]refactor_getter_close, and (b|g):[cpp_]refactor_getter_doc, e.g.
 LetIfUndef g:java_refactor_getter_open "\ {\n"
-LetIfUndef g:java_refactor_getter_close '\n}'
-call lh#refactor#fill('Eg', '_oo_c_', '_definition',  ['signature', 'body'])
+LetIfUndef g:java_refactor_getter_close "\n}"
+LetIfUndef g:refactor_getter_doc   "/**\ ${_ppt_name}\ getter.\ */\n"
+call lh#refactor#fill('Eg', '_oo_c_', '_definition',  ['doc', 'signature', 'body'])
 call lh#refactor#fill('Eg', '_oo_c_', 'space',        ' ')
 call lh#refactor#fill('Eg', '_oo_c_', 'eol',          ';')
 call lh#refactor#fill('Eg', '_oo_c_', 'open',         lh#function#bind ("lh#dev#option#get('refactor_getter_open', &ft, ' { ')"))
 call lh#refactor#fill('Eg', '_oo_c_', 'close',        lh#function#bind ("lh#dev#option#get('refactor_getter_close', &ft, '}')"))
 call lh#refactor#fill('Eg', '_oo_c_', 'return',       "return ")
+" call lh#refactor#fill('Eg', '_oo_c_', 'doc_',         lh#refactor#snippet("/** ${_ppt_name} getter. */\n"))
+call lh#refactor#fill('Eg', '_oo_c_', 'doc',          lh#refactor#opt_snippet ('refactor_getter_doc'))
 call lh#refactor#fill('Eg', '_oo_c_', 'postfix_',     "")
 call lh#refactor#fill('Eg', '_oo_c_', 'prefix_',      "")
 call lh#refactor#fill('Eg', '_oo_c_', 'signature',    ['rettype', 'space', 'fsig', 'postfix_'])
@@ -528,13 +552,16 @@ call lh#refactor#inherit('Eg', 'java', 'cs', 0)
 " # Extract Setter                               {{{2         -----------
 " Generic definition for C++ inspired OO langages           {{{3         -----------
 " no _use in that case
-" Options: (b|g):[cpp_]refactor_setter_open, and (b|g):[cpp_]refactor_setter_close, e.g.
+" Options: (b|g):[cpp_]refactor_setter_open, (b|g):[cpp_]refactor_setter_close, and (b|g):[cpp_]refactor_setter_doc, e.g.
 LetIfUndef g:java_refactor_setter_open "\ {\n"
-LetIfUndef g:java_refactor_setter_close '\n}'
-call lh#refactor#fill('Es', '_oo_c_', '_definition',  ['signature', 'body'])
+LetIfUndef g:java_refactor_setter_close "\n}"
+LetIfUndef g:refactor_setter_doc   "/**\ ${_ppt_name}\ setter.\ */\n"
+call lh#refactor#fill('Es', '_oo_c_', '_definition',  ['doc', 'signature', 'body'])
 call lh#refactor#fill('Es', '_oo_c_', 'signature',    ['rettype', 'fsig', 'postfix_'])
 call lh#refactor#fill('Es', '_oo_c_', 'rettype',      ['prefix_', '_static', 'void'])
 call lh#refactor#fill('Es', '_oo_c_', 'fsig',         lh#function#bind('lh#refactor#hfunc(v:1_, "_args")'))
+" call lh#refactor#fill('Es', '_oo_c_', 'doc_',         lh#refactor#snippet("/** ${_ppt_name} setter. */\n"))
+call lh#refactor#fill('Es', '_oo_c_', 'doc',          lh#refactor#opt_snippet ('refactor_setter_doc'))
 call lh#refactor#fill('Es', '_oo_c_', 'postfix_',     "")
 call lh#refactor#fill('Es', '_oo_c_', 'prefix_',      "")
 call lh#refactor#fill('Es', '_oo_c_', 'void',         'void ')
@@ -620,6 +647,14 @@ function! s:Concat(ft, refactoring, lElements, variables)
       let s = a:variables[element]
     else
       let r = s:Option(a:ft, a:refactoring, element, a:variables)
+      " Loop in case a functor returns another functor as
+      " lh#refactor#opt_snippet() does
+      while type(r) == type({}) && has_key(r, 'execute')
+        let r2 = lh#function#execute(r, a:variables)
+        unlet r
+        let r = r2
+        unlet r2
+      endwhile
       if type(r) == type([])
         let s = s:Concat(a:ft, a:refactoring, r, a:variables)
       else
@@ -802,6 +837,7 @@ function! lh#refactor#extract_getter()
 
     " Prepare the function body
     let params    = {
+          \ '_ppt_name': name,
           \ '_name': attribute.name, '_type': attribute.type, 
           \ '_static': (has_key(attribute,'static') && attribute.static ? 'static ' : ''),
           \ '_fname': getter_name, '_void': ''}
@@ -839,6 +875,7 @@ function! lh#refactor#extract_setter()
 
     " Prepare the function body
     let params    = {
+          \ '_ppt_name': name,
           \ '_name': attribute.name, '_type': attribute.type, 
           \ '_static': (has_key(attribute,'static') && attribute.static ? 'static ' : ''),
           \ '_fname': setter_name, '_args': sFormal,
