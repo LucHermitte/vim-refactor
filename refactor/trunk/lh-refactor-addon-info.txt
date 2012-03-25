@@ -7,7 +7,7 @@
   "dependencies" : {
       "lh-vim-lib" : {"type" : "svn", "url" : "http://lh-vim.googlecode.com/svn/vim-lib/trunk"},
       "lh-brackets" : {"type": "svn", "url": "http://lh-vim.googlecode.com/svn/map-tools/trunk"},
-      "mu-template" : {"type": "svn", "url": "http://lh-vim.googlecode.com/svn/mu-template/trunk"}
+      "mu-template.lh" : {"type": "svn", "url": "http://lh-vim.googlecode.com/svn/mu-template/trunk"}
   },
   "description" : "Generic Refactoring Plugin",
   "homepage" : "http://code.google.com/p/lh-vim/wiki/lhRefactor"
