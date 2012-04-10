@@ -1,4 +1,4 @@
-*refactor.txt*          Language independent refactoring helpers (v0.2.2)
+*refactor.txt*          Language independent refactoring helpers (v1.0.0)
 *refactor.vim*          For Vim version 7.x.    Last change: $Date$
 
                         By Luc Hermitte
@@ -9,16 +9,18 @@
 CONTENTS                                    *refactor-contents*           {{{1
 |refactor-presentation|         Presentation
 
-  |refactor-extract-method|     Extract-Method
-  |refactor-extract-type|       Extract-Type
-  |refactor-extract-variable|   Extract-Variable
-  |refactor-extract-getter|     Extract-Getter
-  |refactor-extract-setter|     Extract-Setter
-  |refactor-encapsulate-field|  Encapsulate-Field (not implemented yet)
-  |refactor-extract-class|      Extract-Class     (not implemented yet)
+  |refactor-extract-method|       Extract-Method
+  |refactor-extract-type|         Extract-Type
+  |refactor-extract-variable|     Extract-Variable
+  |refactor-extract-getter|       Extract-Getter
+  |refactor-extract-setter|       Extract-Setter
+  |refactor-encapsulate-field|    Encapsulate-Field (not implemented yet)
+  |refactor-extract-class|        Extract-Class     (not implemented yet)
 
 |refactor-mappings|             New mappings for quick refactoring
 |refactor-extend|               Extending the refactorings to new filetypes
+  |refactoring-properties|        Propeties available
+  |refactor-functors|             Functors available
 |refactor-links|                Links of interest
 |refactor-notes|                Notes
 |add-local-help|                Instructions on installing this file
@@ -90,7 +92,7 @@ implemented in refactor.vim: C, C++, Java, Pascal, sh, VimL
 
                                                         *refactor-EM_new-ft*
 In order to define hooks for this refactoring, the function
-|lh#refactor#fill()| shall ne used with the following arguments:
+|lh#refactor#fill()| shall be used with the following arguments:
   - "EM" (as in "Extract Method")
   - {ft}
   - {hook} which tells which hook we want to define
@@ -208,7 +210,7 @@ The behavior of these commands can be tuned for various languages. See
 |refactor-extend|.
 
 In order to define hooks for this refactoring, the function
-|lh#refactor#fill()| shall ne used with the following arguments:
+|lh#refactor#fill()| shall be used with the following arguments:
   - "ET" (as in "Extract Type")
   - {ft}
   - {hook} which tells which hook we want to define
@@ -221,7 +223,7 @@ In order to define hooks for this refactoring, the function
 
 
 ==============================================================================
-EXTRACT-VARIABLE REFACTORING               *refactor-extract-variable*    {{{1
+EXTRACT-VARIABLE REFACTORING                *refactor-extract-variable*    {{{1
 
 This refactoring consists in extracting a complex variable expression in the code,
 and define a new variable. 
@@ -269,7 +271,7 @@ The behavior of these commands can be tuned for various languages. See
 |refactor-extend|.
 
 In order to define hooks for this refactoring, the function
-|lh#refactor#fill()| shall ne used with the following arguments:
+|lh#refactor#fill()| shall be used with the following arguments:
   - "EV" (as in "Extract Variable")
   - {ft}
   - {hook} which tells which hook we want to define
@@ -308,20 +310,22 @@ implemented in refactor.vim: C++, Java, and C#.
 Remarks:
 - Issues of const-correctness are taken into account in C++.
 - I'm not a Java nor C# guy. Hence attribute decoding may require some tuning
-  for those languages. LEt me know if you find any bug.
+  for those languages. Let me know if you find any bug.
 
 The behavior of these commands can be tuned for various languages. See
 |refactor-extend|.
 
 In order to define hooks for this refactoring, the function
-|lh#refactor#fill()| shall ne used with the following arguments:
+|lh#refactor#fill()| shall be used with the following arguments:
   - "Eg" (as in "Extract Getter"), or "Es" (as in "Extract Setter")
   - {ft}
   - {hook} which tells which hook we want to define
     This refactoring expect at least the following hook to be defined:
     "_definition" that describes how the extracted accessor/mutator
       definition is built.
-    It takes the following parameters: (this will change!)
+    It takes the following parameters (|refactoring-properties|): (this will
+    changehttp://code.google.com/p/lh-vim/wiki/license!)
+    - "_ppt_name"
     - "_name"
     - "_type"
     - "_static"
@@ -333,12 +337,15 @@ The default generation procedure uses the following parametrable functions:
 - |lh#dev#naming#variable()| to deduce the property name
 - |lh#dev#naming#getter()|   to build the getter name
 - |lh#dev#naming#setter()|   to build the setter name
-- |lh#dev#naming#param()|    to build the parameter name (forthe setter)
-and on the following options to specify how code blocks shall be inserted:
+- |lh#dev#naming#param()|    to build the parameter name (for the setter)
+It relies on the following options to specify how code blocks shall be inserted:
 - *(bg):{ft_}refactor_getter_open*  = ' { ' -- " {\n" for java
 - *(bg):{ft_}refactor_getter_close* = '}'   -- "\n}"  for java
 - *(bg):{ft_}refactor_setter_open*  = ' { ' -- " {\n" for java
 - *(bg):{ft_}refactor_setter_close* = '}'   -- "\n}"  for java
+And on the following overidable option to specify documentation format:
+- *(bg):{ft_}refactor_getter_doc*   = "/**\ ${_ppt_name} setter. */\n"
+- *(bg):{ft_}refactor_setter_doc*   = "/**\ ${_ppt_name} getter. */\n"
 
 ==============================================================================
 ENCAPSULATE-FIELD REFACTORING               *refactor-encapsulate-field*  {{{1
@@ -362,11 +369,11 @@ Issues of where the code must be put (c++), ...
 ==============================================================================
 MAPPINGS                                    *refactor-mappings*           {{{1
 
-    *v_CTRL-X_f* ....|refactor-extract-method|
-    *v_CTRL-X_v* ....|refactor-extract-variable|
-    *v_CTRL-X_t* ....|refactor-extract-type|
-    *n_CTRL-X_g* ....|refactor-extract-getter|
-    *n_CTRL-X_s* ....|refactor-extract-setter|
+    *v_CTRL-X_f* .... |refactor-extract-method|
+    *v_CTRL-X_v* .... |refactor-extract-variable|
+    *v_CTRL-X_t* .... |refactor-extract-type|
+    *n_CTRL-X_g* .... |refactor-extract-getter|
+    *n_CTRL-X_s* .... |refactor-extract-setter|
     *CTRL-X_p*   .... put back the last thing extracted after the cursor
     *CTRL-X_P*   .... put back the last thing extracted before the cursor
 
@@ -394,7 +401,7 @@ defined.
 
 
                                                 *lh#refactor#fill()*
-Defining a new hook is done with |lh#refactor#fill()|which takes the following
+Defining a new hook is done with |lh#refactor#fill()| which takes the following
 arguments:
 - the refactoring kind,
 - the filetype it applies to,
@@ -440,19 +447,61 @@ following parameters:
 If a hook is shared, overiding it will override the hook for all the filetypes
 sharing it.
 
-Helper functors~
-                                                *lh#refactor#hfunc()*
-It returns its argument followed by "(«parameters»)" if its argument contains
-no open-bracket "(".
 
-                                                *lh#refactor#placeholder()*
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *refactoring-property*
+                                                *refactoring-properties*
+Refactoring properties~
+Refactoring properties are the parameters filled by the refactoring routines
+(that analyse the code to refactor) to the code generator hooks.
+
+They can be directly replaced with their value when the expansion of hooks,
+defined with |lh#refactor#fill()|, is done.
+They can be reached in snippets (see |lh#refactor#snippet()|) when within "${}"
+New properties can be added to a refactoring under evaluation thanks to
+|lh#refactor#let()|.
+
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                                                *refactor-functors*
+Helper functors~
+
+                                                    *lh#refactor#hfunc()*
+lh#refactor#hfunc({dict},{params})~
+It returns ${{dict}._fname} value followed by "(«parameters»)" if its argument
+contains no open-bracket "(".
+
+                                                    *lh#refactor#hfunc_full()*
+lh#refactor#hfunc_full({dict},{params})~
+It returns ${{dict}._fname_full} value followed by "(«parameters»)" if its
+argument contains no open-bracket "(".
+
+                                                    *lh#refactor#placeholder()*
+lh#refactor#placeholder({text} [, {extra}])~
 Returns a |lhvl#function| that returns a dynamically computed
 placeholder/|marker| thanks to |Marker_Txt()|. As it is dynamically computed,
 the placeholder characters may be changed at anytime.
 
-                                                *lh#refactor#let()#*
-Returns a |lhvl#function| that assigns a value into a variable that is made
-available to all hooks of the refactoring.
+                                                    *lh#refactor#let()*
+lh#refactor#let({varname}, {value})~
+Returns a |lhvl#function| that assigns a value into a |refactoring-property|
+that is made available to all hooks of the refactoring.
+
+
+                                                    *lh#refactor#snippet()*
+lh#refactor#snippet({text})~
+Returns a |lhvl#function| that returns the text passed in parameters, but with
+variables within ${} extracted from the current |refactoring-properties|.
+Snippets do not support inline computations. Have your computations done
+elsewhere (for instance: in hooks evaluation).
+
+
+                                                    *lh#refactor#opt_snippet()*
+lh#refactor#opt_snippet({option})~
+This function is a wrapper around |lh#refactor#snippet()|. It fetches the
+language-specializable option received as a parameter (see
+|lh#dev#option#get()|), and then uses its value as parameter for
+|lh#refactor#snippet()|.
 
 
 ==============================================================================
@@ -501,9 +550,14 @@ those variables, and a way to the user to choose how they will be exchanged.
 
 And of course, many other refactorings need to be implemented.
 
+License(s)~
+lh-refactor code is under GPLv3 license.
+Source code produced with lh-refactor has a license exception, see
+<http://code.google.com/p/lh-vim/wiki/License>
+
 
 ==============================================================================
- © Luc Hermitte, 2005-2011 <http://code.google.com/p/lh-vim/>
+ © Luc Hermitte, 2005-2012 <http://code.google.com/p/lh-vim/>
  $Id$
  VIM: let b:VS_language = 'american' 
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:

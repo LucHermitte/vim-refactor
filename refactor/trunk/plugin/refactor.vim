@@ -2,9 +2,9 @@
 " File:		refactor.vim                                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	v0.2.2
+" Version:	v1.0.0
 " Created:	11th Mar 2005
-" Last Update:	08th Sep 2009
+" Last Update:	02nd Mar 2012
 "------------------------------------------------------------------------
 " Description:	Some refactoring oriented mappings and commands
 "
@@ -26,9 +26,10 @@
 "
 " 	Adding new langages ....
 "
-" 	Requires: bracketing.base.vim, Vim7
+" 	Requires: vim7, lh-vim-lib, lh-dev, lh-tags
 "
 " History:
+" 	v1.0.0: GPLv3
 " 	v0.2.2:	Feb - 23rd Aug 2011
 " 	        * <c-x>g and <c-x>s to prepare getters and setters
 " 	v0.0.4:	31st Oct 2007 - 08th Sep 2009

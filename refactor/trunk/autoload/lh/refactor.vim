@@ -3,7 +3,7 @@
 " File:         autoload/lh/refactor.vim                                 {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://code.google.com/p/lh-vim/>
-" Version:      0.2.3
+" Version:      1.0.0
 " Created:      31st Oct 2008
 " Last Update:  $Date$
 "------------------------------------------------------------------------
@@ -25,6 +25,7 @@
 "       v0.2.3 Bug fixes in Getter/Setter
 "              New helper functions lh#refactor#snippet() and
 "              lh#refactor#opt_snippet()
+"       v1.0.0 GPLv3
 "              
 " TODO:         
 "       - support <++> as placeholder marks, and automatically convert them to
@@ -57,7 +58,7 @@ function! s:IsCConst(variableName)
   return isConst
 endfunction
 
-" lh#refactor#hfunc(XXXXXXXXXXX                             {{{3
+" lh#refactor#hfunc(dict,params)                            {{{3
 " Global helper function that builds the signature of a function by
 " adding parenthesis after the text given. If there is already a
 " parenthesis in the text, nothing is added.
@@ -90,7 +91,7 @@ function! lh#refactor#_add_key(dict, varname, value)
   return ''
 endfunction
 
-" lh#refactor#let(dict, varname, value)                     {{{3
+" lh#refactor#let(varname, value)                           {{{3
 function! lh#refactor#let(varname, value)
   let f = lh#function#bind("lh#refactor#_add_key(v:1_, ".string(a:varname).','.(a:value).")")
   return f
