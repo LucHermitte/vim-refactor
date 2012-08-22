@@ -26,6 +26,7 @@
 "              New helper functions lh#refactor#snippet() and
 "              lh#refactor#opt_snippet()
 "       v1.0.0 GPLv3
+" 	v1.1.0 FixRealloc
 "              
 " TODO:         
 "       - support <++> as placeholder marks, and automatically convert them to
@@ -590,6 +591,18 @@ call lh#refactor#inherit('Es', 'java', 'cs', 0)
 
 
 
+" # Fix Realloc                                  {{{2         -----------
+" C & familly                                               {{{3         -----------
+" call lh#refactor#fill('FR', 'c', '_use',         ['_varname'])
+" call lh#refactor#fill('FR', 'c', '_definition',  ['mutable', 'type', '_varname', 'assign', '_value', 'eol'])
+" call lh#refactor#fill('FR', 'c', 'assign',       ' = ')
+" call lh#refactor#fill('FR', 'c', 'eol',          ';')
+" call lh#refactor#fill('FR', 'c', 'type',         lh#refactor#placeholder('type', ' '))
+" call lh#refactor#fill('FR', 'c', 'mutable',      lh#function#bind(function('lh#refactor#const_key'), 'v:1_._varname'))
+
+" call lh#refactor#inherit('FR', 'c', 'cpp', 1)
+
+
 " ## Misc Functions     {{{1
 
 " # Version                                      {{{2         -----------
@@ -894,6 +907,81 @@ function! lh#refactor#extract_setter()
   endtry
 endfunction
 
+
+" # Fix C p=realloc(p, size)                     {{{2         -----------
+" lh#refactor#fix_realloc( [name] ) range                   {{{3
+" Main function called by :FixRealloc
+" @pre: there is no selection
+" @pre: the current line contains everything from start to ;
+
+function! lh#refactor#fix_realloc() abort range
+  try
+    let a_save = @a
+
+    exe a:firstline.','.a:lastline.'yank a'
+    " Extract the selected expression into register @a
+    let line = substitute(@a, '\_s\+', ' ', 'g')
+    " echomsg line
+  finally
+    " Restaure the register @a
+    let @a = a_save
+  endtry
+
+  let [all, lhs, type, realloc, rhs, size, in_macro; tail] = matchlist(line,
+	\ '^\s*\(.\{-}\)\s*=\s*\((.\{-}\)\=\s*\(\k*realloc\)\s*(\s*\(.\{-}\)\s*,\s*\(.\{-}\)\s*);\s*\(\\\)\=')
+  if (lhs != rhs)
+    throw "the pointers used in realloc mismatch: <".lhs."> != <".rhs.">. Aborting"
+    return
+  endif
+  let expected_realloc = lh#dev#option#get('refactor_expected_realloc', &ft, 'realloc')
+  if realloc !~  'realloc' && realloc != expected_realloc
+    throw "This call doesn't look like a call to realloc. Aborting."
+    return
+  endif
+  let lhs_prefix    = lh#dev#option#get('refactor_temp_prefix', &ft, 'new_')
+  let free_function = lh#dev#option#get('refactor_free_function', &ft, 'free')
+  let false         = lh#dev#option#get('refactor_false', &ft, 'false')
+  let type          = substitute(type, '(\s*\(.\{-}\)\s*\*\s*)', '\1', '')
+  " build temporary_variable identifier
+  let lhs = lhs_prefix . lh#dev#naming#variable(matchstr(lhs, '.\{-}\zs\k\+$'))
+  " count=number of element * sizeof, or size
+  let cnt = (size =~ 'sizeof')
+	\ ? substitute(size, '\s*\(\*\s*\)\=sizeof([^)]*)\s*\(\*\s*\)\=', '', '')
+	\ : size
+  let args = {
+	\  'ptr'    : rhs
+	\, 'lhs'    : lhs
+	\, 'type'   : type
+	\, 'count'  : cnt
+	\, 'size'   : size
+	\, 'realloc': realloc
+	\, 'free'   : free_function
+	\, 'macro'  : in_macro
+	\, 'false'  : false
+	\ }
+  echomsg string(args)
+  exe a:firstline.','.a:lastline.'delete _'
+  call append(a:firstline-1, '')
+  call setpos('.', [0, a:firstline, 1, 1])
+  call lh#mut#expand_and_jump(0, 'c/realloc', args)
+  return 
+endfunction
+
+" lh#refactor#default_varname()                             {{{3
+" Helper function called by :ExtractVariable
+" @pre: the selection is not expected to be line-wise
+function! lh#refactor#default_varname()
+  let expression = lh#visual#selection()
+  " try to determine type or any other meaningful thing (may not be possible...)
+  try 
+    let lVarNameData = s:Option(&ft, 'EV_name', '_naming_policy', '') 
+  catch /.*/
+    " no key => default a default empty name
+    return ""
+  endtry
+  let sName = s:Concat(&ft, 'EV_name', lVarNameData, {'_value':expression})
+  return sName
+endfunction
 
 " General functions                              {{{2         -----------
 " lh#refactor#put_extracted_stuff(bang,what)                {{{3
