@@ -2,7 +2,7 @@
 " File:		refactor.vim                                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	v1.0.0
+" Version:	v1.1.0
 " Created:	11th Mar 2005
 " Last Update:	02nd Mar 2012
 "------------------------------------------------------------------------
@@ -29,6 +29,7 @@
 " 	Requires: vim7, lh-vim-lib, lh-dev, lh-tags
 "
 " History:
+" 	v1.1.0: * FixRealloc
 " 	v1.0.0: GPLv3
 " 	v0.2.2:	Feb - 23rd Aug 2011
 " 	        * <c-x>g and <c-x>s to prepare getters and setters
@@ -59,7 +60,6 @@
 " * documentation
 " * callback for C++, be smart
 " * simplify the the use of is_like stuff
-" * autoload
 " }}}1
 "=============================================================================
 
@@ -75,6 +75,22 @@ set cpo&vim
 " Avoid global reinclusion }}}1
 "------------------------------------------------------------------------
 " Commands and mappings                     {{{1
+
+" Command: :FixRealloc
+" Analyses the current call to realloc, and fixes
+"    p = (T*) realloc(p, size);
+" into
+"    T* new_p = (T*) realloc(p, size);
+"    if (! new_p) {
+"        free(p)
+"        size = 0;
+"        p = 0;
+"        error_message();
+"        return false;
+"    }
+"    p = new_p;
+command! -range -nargs=0 FixRealloc
+      \ :<line1>,<line2>call lh#refactor#fix_realloc()
 
 " Command: :ExtractFunction [<function_name> <signature>]
 " Extracts the body of a newly factored function;
