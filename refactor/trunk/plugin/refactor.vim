@@ -2,7 +2,7 @@
 " File:		refactor.vim                                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	v1.1.0
+" Version:	v1.1.1
 " Created:	11th Mar 2005
 " Last Update:	02nd Mar 2012
 "------------------------------------------------------------------------
@@ -29,6 +29,9 @@
 " 	Requires: vim7, lh-vim-lib, lh-dev, lh-tags
 "
 " History:
+" 	v1.1.1: 18th Dec 2013
+" 	        * Extract commands fixed to correctly process the visual
+" 	          selection
 " 	v1.1.0: * FixRealloc
 " 	v1.0.0: GPLv3
 " 	v0.2.2:	Feb - 23rd Aug 2011
@@ -90,24 +93,24 @@ set cpo&vim
 "    }
 "    p = new_p;
 command! -range -nargs=0 FixRealloc
-      \ :<line1>,<line2>call lh#refactor#fix_realloc()
+      \ <line1>,<line2>call lh#refactor#fix_realloc()
 
 " Command: :ExtractFunction [<function_name> <signature>]
 " Extracts the body of a newly factored function;
 " As an optional argument, we can give the name of the new function
 command! -range -nargs=* ExtractFunction
-      \ :call lh#refactor#extract_function(0, <f-args>)
+      \ <line1>,<line2>call lh#refactor#extract_function(0, <f-args>)
 
 " Command: :ExtractVariable <variable_name>
 " Extracts an expression to a newly factored variable;
 command! -range -nargs=1 ExtractVariable
-      \ :call lh#refactor#extract_variable(0, <f-args>)
+      \ <line1>,<line2>call lh#refactor#extract_variable(0, <f-args>)
 
 
 " Command: :ExtractType <type_name>
 " Extracts an expression to a newly factored type;
 command! -range -nargs=1 ExtractType
-      \ :call lh#refactor#extract_type(0, <f-args>)
+      \ <line1>,<line2>call lh#refactor#extract_type(0, <f-args>)
 
 " Command: :PutExtracted
 " Put the body of the extracted thing somewhere else
