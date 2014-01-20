@@ -2,7 +2,7 @@
 " File:		refactor.vim                                           {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	v1.1.1
+" Version:	v1.2.0
 " Created:	11th Mar 2005
 " Last Update:	02nd Mar 2012
 "------------------------------------------------------------------------
@@ -29,6 +29,9 @@
 " 	Requires: vim7, lh-vim-lib, lh-dev, lh-tags
 "
 " History:
+" 	v1.2.0: 20th Jan 2014
+" 	        * Can be extended thanks to external files
+" 	        * Bugs fixed regarding snippets for *extracting variables*.
 " 	v1.1.1: 18th Dec 2013
 " 	        * Extract commands fixed to correctly process the visual
 " 	          selection
@@ -72,7 +75,7 @@
 if exists("g:loaded_refactor") && !exists('g:force_reload_refactor')
   finish
 endif
-let g:loaded_refactor = 022
+let g:loaded_refactor = 120
 let s:cpo_save=&cpo
 set cpo&vim
 " Avoid global reinclusion }}}1
