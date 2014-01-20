@@ -3,7 +3,7 @@
 " File:         autoload/lh/refactor.vim                                 {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://code.google.com/p/lh-vim/>
-" Version:      1.0.0
+" Version:      1.2.0
 " Created:      31st Oct 2008
 " Last Update:  $Date$
 "------------------------------------------------------------------------
@@ -27,6 +27,8 @@
 "              lh#refactor#opt_snippet()
 "       v1.0.0 GPLv3
 " 	v1.1.0 FixRealloc
+" 	v1.2.0 Can be extended thanks to external files
+" 	       Bugs fixed regarding snippets for *extracting variables*.
 "              
 " TODO:         
 "       - support <++> as placeholder marks, and automatically convert them to
@@ -392,55 +394,6 @@ endfunction
 " ## Refactorings {{{1
 "
 " # Extract Method                               {{{2         -----------
-" C & familly                                               {{{3         -----------
-call lh#refactor#fill('EM', 'c', '_call', ['call'])
-call lh#refactor#fill('EM', 'c', '_function', ['begin', '_body', 'end'])
-
-call lh#refactor#fill('EM', 'c', 'placeholder', lh#refactor#placeholder(''))
-call lh#refactor#fill('EM', 'c', 'NL',          "\n")
-call lh#refactor#fill('EM', 'c', 'rettype',     lh#refactor#placeholder('ReturnType', ' '))
-call lh#refactor#fill('EM', 'c', 'fsig',        lh#function#bind('lh#refactor#hfunc(v:1_, "_formal_params")'))
-call lh#refactor#fill('EM', 'c', 'open',        "\n{")
-call lh#refactor#fill('EM', 'c', 'begin',       ['rettype', 'fsig', 'open', 'NL'])
-call lh#refactor#fill('EM', 'c', 'close',       "\n}")
-call lh#refactor#fill('EM', 'c', 'end',         ['close', 'placeholder', 'NL'])
-" call has to accept an optional parameter: the function parameters...
-call lh#refactor#fill('EM', 'c', 'call',        lh#function#bind("lh#refactor#hfunc(v:1_, '_real_params').';'.Marker_Txt()"))
-
-call lh#refactor#inherit('EM', 'c', 'cpp', 0)
-" In C++ case, the definition of the function may require to prepend the name
-" with the class name.
-" @todo: check with namespace
-call lh#refactor#fill('EM', 'cpp', 'fsig',      lh#function#bind('lh#refactor#hfunc_def_full(v:1_, "_formal_params")'))
-call lh#refactor#inherit('EM', 'c', 'java', 0)
-
-
-" VimL                                                      {{{3         -----------
-call lh#refactor#fill('EM', 'vim', '_call',      ['call', 'placeholder'])
-call lh#refactor#fill('EM', 'vim', '_function',  ['begin', '_body', 'end'])
-
-call lh#refactor#fill('EM', 'vim', 'call',       lh#function#bind("lh#refactor#hfunc(v:1_, '_real_params')"))
-call lh#refactor#fill('EM', 'vim', 'begin',      ['k_function', 'fsig', 'NL'])
-call lh#refactor#fill('EM', 'vim', 'k_function', "function! ")
-call lh#refactor#fill('EM', 'vim', 'fsig',       lh#function#bind('lh#refactor#hfunc(v:1_, "_formal_params")'))
-call lh#refactor#fill('EM', 'vim', 'NL',         "\n")
-call lh#refactor#fill('EM', 'vim', 'end',        ['NL', 'k_endf', 'placeholder', 'NL'])
-call lh#refactor#fill('EM', 'vim', 'k_endf',     "endfunction")
-call lh#refactor#fill('EM', 'vim', 'placeholder', lh#refactor#placeholder(''))
-
-
-" Shell scripts (sh, bash, ...)                             {{{3         -----------
-call lh#refactor#fill('EM', 'sh', '_call',       ['fcall'])
-call lh#refactor#fill('EM', 'sh', 'fcall',       lh#function#bind('v:1_._fname ." ".Marker_Txt("parameters")') )
-call lh#refactor#fill('EM', 'sh', '_function',   ['begin', '_body', 'end'])
-call lh#refactor#fill('EM', 'sh', 'begin',       [ 'fsig', 'open' ] )
-call lh#refactor#fill('EM', 'sh', 'fsig',        lh#function#bind('v:1_._fname . "()"'))
-call lh#refactor#fill('EM', 'sh', 'open',        " {\n" )
-call lh#refactor#fill('EM', 'sh', 'end',         ['placeholder', 'close', 'placeholder'] )
-call lh#refactor#fill('EM', 'sh', 'placeholder', lh#refactor#placeholder(''))
-call lh#refactor#fill('EM', 'sh', 'close',       "\n}" )
-
-
 " Pascal                                                    {{{3         -----------
 call lh#refactor#fill('EM', 'pascal', '_call',      ['ask_kind', 'call'])
 call lh#refactor#fill('EM', 'pascal', 'ask_kind',   lh#refactor#let('kind_', "WHICH('CONFIRM', 'nature of the routine? ', 'function\nprocedure', 1)"))
@@ -459,56 +412,8 @@ call lh#refactor#fill('EM', 'pascal', 'k_end',      "end")
 call lh#refactor#fill('EM', 'pascal', 'placeholder', lh#refactor#placeholder(''))
 
 " # Refactoring expression in a new variable     {{{2         -----------
-" C & familly                                               {{{3         -----------
-call lh#refactor#fill('EV', 'c', '_use',         ['_varname'])
-call lh#refactor#fill('EV', 'c', '_definition',  ['mutable', 'type', '_varname', 'assign', '_value', 'eol'])
-call lh#refactor#fill('EV', 'c', 'assign',       ' = ')
-call lh#refactor#fill('EV', 'c', 'eol',          ';')
-call lh#refactor#fill('EV', 'c', 'type',         lh#refactor#placeholder('type', ' '))
-call lh#refactor#fill('EV', 'c', 'mutable',      lh#function#bind(function('lh#refactor#const_key'), 'v:1_._varname'))
-
-call lh#refactor#inherit('EV', 'c', 'cpp', 1)
-" overide type for C++
-call lh#refactor#fill('EV', 'cpp', 'type',         lh#refactor#placeholder('auto', ' ')) " C++11
-
-
-" VimL                                                      {{{3         -----------
-call lh#refactor#fill('EV', 'vim', '_use',         ['_varname'])
-call lh#refactor#fill('EV', 'vim', '_definition',  ['let', '_varname', 'assign', '_value'])
-call lh#refactor#fill('EV', 'vim', 'assign',       ' = ')
-call lh#refactor#fill('EV', 'vim', 'let',          'let ')
-
-" Perl                                                      {{{3         -----------
-call lh#refactor#fill('EV', 'perl', '_use',         ['_varname'])
-call lh#refactor#fill('EV', 'perl', '_definition',  ['my', '_varname', 'assign', '_value', 'eol'])
-call lh#refactor#fill('EV', 'perl', 'assign',       ' = ')
-call lh#refactor#fill('EV', 'perl', 'my',           'my ')
-call lh#refactor#fill('EV', 'perl', 'eol',          ';')
-
-call lh#refactor#fill('EV_name', 'perl',            '_naming_policy', ['$'])
-call lh#refactor#fill('EV_name', 'perl', '$',       '$')
-
-" Shell scripts (sh, bash, ...)                             {{{3         -----------
-call lh#refactor#fill('EV', 'sh', '_use',         ['var_start', '_varname', 'var_end'])
-call lh#refactor#fill('EV', 'sh', 'var_start',    '${')
-call lh#refactor#fill('EV', 'sh', 'var_end',      '}')
-call lh#refactor#fill('EV', 'sh', '_definition',  ['_varname', 'assign', '_value'])
-call lh#refactor#fill('EV', 'sh', 'assign',       '=')
-
-" call lh#refactor#fill('EV_name', 'sh',            '_naming_policy', ['$'])
-" call lh#refactor#fill('EV_name', 'sh', '$',       '$')
-
 
 " # Extract Type                                 {{{2         -----------
-" C & familly                                               {{{3         -----------
-call lh#refactor#fill('ET', 'c', '_use',         ['_typename'])
-call lh#refactor#fill('ET', 'c', '_definition',  ['typedef', '_typeexpression', 'space', '_typename', 'eol'])
-call lh#refactor#fill('ET', 'c', 'typedef',      'typedef ')
-call lh#refactor#fill('ET', 'c', 'space',        ' ')
-call lh#refactor#fill('ET', 'c', 'eol',          ';')
-
-call lh#refactor#inherit('ET', 'c', 'cpp', 1)
-
 
 " # Extract Getter                               {{{2         -----------
 " Generic definition for C++ inspired OO langages           {{{3         -----------
@@ -532,25 +437,6 @@ call lh#refactor#fill('Eg', '_oo_c_', 'rettype',      ['prefix_', '_static', '_t
 call lh#refactor#fill('Eg', '_oo_c_', 'fsig',         lh#function#bind('lh#refactor#hfunc(v:1_, "_void")'))
 call lh#refactor#fill('Eg', '_oo_c_', 'body',         ['open', 'return', '_name', 'eol', 'close'])
 
-" C++                                                       {{{3         -----------
-" Deep copy of the generic definition, in order to customize the result for C++
-call lh#refactor#inherit('Eg', '_oo_c_', 'cpp', 1)
-call lh#refactor#fill('Eg', 'cpp',    'rettype',      lh#function#bind('lh#dev#cpp#types#ConstCorrectType(v:1_._type)'))
-call lh#refactor#fill('Eg', 'cpp',    'postfix_',      " const".(lh#dev#cpp#use_cpp11()? " noexcept" : ""))
-
-" Java                                                      {{{3         -----------
-" Deep copy of the generic definition, in order to customize the result for Java
-" NB: I seldom develop in Java, this may be wrong
-call lh#refactor#inherit('Eg', '_oo_c_', 'java', 1)
-call lh#refactor#fill('Eg', 'java',   'prefix_',       lh#refactor#placeholder('public '))
-
-" C#                                                        {{{3         -----------
-" Shallow copy of the java definition, nothing to customize
-" NB: I do not develop in C#, this may be wrong
-" We may prefer to generate a property instead
-call lh#refactor#inherit('Eg', 'java', 'cs', 0)
-
-
 " # Extract Setter                               {{{2         -----------
 " Generic definition for C++ inspired OO langages           {{{3         -----------
 " no _use in that case
@@ -573,24 +459,6 @@ call lh#refactor#fill('Es', '_oo_c_', 'body',         ['open', '_instruction', '
 call lh#refactor#fill('Es', '_oo_c_', 'open',         lh#function#bind ("lh#dev#option#get('refactor_setter_open', &ft, ' { ')"))
 call lh#refactor#fill('Es', '_oo_c_', 'close',        lh#function#bind ("lh#dev#option#get('refactor_setter_close', &ft, ' } ')"))
 
-" C++                                                       {{{3         -----------
-" Shallow copy of the generic definition, nothing to customize
-call lh#refactor#inherit('Es', '_oo_c_', 'cpp', 0)
-
-" Java                                                      {{{3         -----------
-" Deep copy of the generic definition, in order to customize the result for Java
-" NB: I seldom develop in Java, this may be wrong
-call lh#refactor#inherit('Es', '_oo_c_', 'java', 1)
-call lh#refactor#fill('Es', 'java',   'prefix_',       lh#refactor#placeholder('public '))
-
-" C#                                                        {{{3         -----------
-" Shallow copy of the java definition, nothing to customize
-" NB: I do not develop in C#, this may be wrong
-" We may prefer to generate a property instead
-call lh#refactor#inherit('Es', 'java', 'cs', 0)
-
-
-
 " # Fix Realloc                                  {{{2         -----------
 " C & familly                                               {{{3         -----------
 " call lh#refactor#fill('FR', 'c', '_use',         ['_varname'])
@@ -606,7 +474,7 @@ call lh#refactor#inherit('Es', 'java', 'cs', 0)
 " ## Misc Functions     {{{1
 
 " # Version                                      {{{2         -----------
-let s:k_version = 010
+let s:k_version = 120
 function! lh#refactor#version()
   return s:k_version
 endfunction
@@ -629,7 +497,7 @@ endfunction
 " # Options                                      {{{2         -----------
 "
 " s:Option(ft, refactoring, name, param)                    {{{3
-function! s:Option(ft, refactorKind, name, param)
+function! s:Option(ft, refactorKind, name, param) abort
   " let opt = g:refactor_params[a:refactorKind][a:name][a:ft]
   if ! has_key(g:refactor_params, a:refactorKind)
     throw "Unknown ".(a:refactorKind)." refactoring kind"
@@ -654,9 +522,10 @@ function! s:Option(ft, refactorKind, name, param)
 endfunction
 
 " s:Concat(ft, refactoring, elements, variables)            {{{3
-function! s:Concat(ft, refactoring, lElements, variables)
+function! s:Concat(ft, refactoring, lElements, variables) abort
   let result = ''
-  for element in a:lElements
+  let lElements = type(a:lElements) == type([]) ? (a:lElements) : [a:lElements]
+  for element in lElements
     if has_key(a:variables, element)
       let s = a:variables[element]
     else
@@ -690,6 +559,7 @@ function! lh#refactor#extract_function(mayabort, functionName) range abort
   if (strlen(a:functionName)==0) && a:mayabort
     throw "ExtractFunction: Please specify a name for the new function"
   endif
+  silent! exe "call lh#refactor#".&ft.'#load()'
   let lCall     = s:Option(&ft, 'EM', '_call', '')
   let lFunction = s:Option(&ft, 'EM', '_function', '')
 
@@ -746,11 +616,11 @@ function! lh#refactor#extract_variable(mayabort, variableName) range abort
   if (strlen(a:variableName)==0) && a:mayabort
     throw "ExtractVariable: Please specify a name for the new variable"
   endif
-  let lUse        = s:Option(&ft, 'EV', '_use', '')
-  let lDefinition = s:Option(&ft, 'EV', '_definition', '')
-
+  silent! exe "call lh#refactor#".&ft.'#load()'
   let params      = {'_varname': a:variableName}
-  let sUse        = s:Concat(&ft, 'EV', lUse       , params)
+  let lUse        = s:Option(&ft, 'EV', '_use', params)
+  " snippets will return text and not list of stuff
+  let sUse        = type(lUse) != type([]) ? lUse : s:Concat(&ft, 'EV', lUse, params)
 
   try
     let a_save = @a
@@ -758,7 +628,8 @@ function! lh#refactor#extract_variable(mayabort, variableName) range abort
     " Extract the selected expression into register @a
     exe "normal! gv\"ac".sUse
     let params['_value'] = @a " reuse the same variable as _use may have added some data to params
-    let sDefinition = s:Concat(&ft, 'EV', lDefinition, params)
+    let lDefinition = s:Option(&ft, 'EV', '_definition', params)
+    let sDefinition = type(lDefinition) != type([]) ? lDefinition : s:Concat(&ft, 'EV', lDefinition, params)
     let s:variable = sDefinition
     let s:last_refactor='variable'
 
@@ -804,6 +675,7 @@ function! lh#refactor#extract_type(mayabort, typeName) range abort
   if (strlen(a:typeName)==0) && a:mayabort
     throw "ExtractType: Please specify a name for the new type"
   endif
+  silent! exe "call lh#refactor#".&ft.'#load()'
   let lUse        = s:Option(&ft, 'ET', '_use', '')
   let lDefinition = s:Option(&ft, 'ET', '_definition', '')
 
@@ -841,6 +713,7 @@ endfunction
 " @pre: the selection must be line-wise
 " @todo: determine external variables, and returned data
 function! lh#refactor#extract_getter()
+  silent! exe "call lh#refactor#".&ft.'#load()'
   let lFunction = s:Option(&ft, 'Eg', '_definition', '')
 
   try
@@ -873,6 +746,7 @@ endfunction
 " @pre: the selection must be line-wise
 " @todo: determine external variables, and returned data
 function! lh#refactor#extract_setter()
+  silent! exe "call lh#refactor#".&ft.'#load()'
   let lFunction = s:Option(&ft, 'Es', '_definition', '')
 
   try
@@ -915,6 +789,7 @@ endfunction
 " @pre: the current line contains everything from start to ;
 
 function! lh#refactor#fix_realloc() abort range
+  silent! exe "call lh#refactor#".&ft.'#load()'
   try
     let a_save = @a
 
@@ -967,7 +842,7 @@ function! lh#refactor#fix_realloc() abort range
   return 
 endfunction
 
-" lh#refactor#default_varname()                             {{{3
+" lh#refactor#default_varname()                             {{{2
 " Helper function called by :ExtractVariable
 " @pre: the selection is not expected to be line-wise
 function! lh#refactor#default_varname()

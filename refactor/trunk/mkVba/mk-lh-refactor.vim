@@ -3,8 +3,8 @@
 " File:		mkVba/mk-lh-refactor.vim                            {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	1.1.1
-let s:version = '1.1.1'
+" Version:	1.2.0
+let s:version = '1.2.0'
 " Created:	06th Nov 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
@@ -30,6 +30,15 @@ finally
   let &rtp = save_rtp
 endtry
 finish
+autoload/lh/refactor/c.vim
+autoload/lh/refactor/cpp.vim
+autoload/lh/refactor/cs.vim
+autoload/lh/refactor/java.vim
+autoload/lh/refactor/javascript.vim
+autoload/lh/refactor/perl.vim
+autoload/lh/refactor/php.vim
+autoload/lh/refactor/sh.vim
+autoload/lh/refactor/vim.vim
 autoload/lh/refactor.vim
 doc/refactor.txt
 ftplugin/cpp/cpp_refactor.vim
