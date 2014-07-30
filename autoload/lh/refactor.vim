@@ -36,7 +36,7 @@
 "       - jump to the first placeholder
 "       - should I simplify the use to rely on mu-template expansion engine ?
 "       - option to return nothing from lh#refactor#placeholder() when
-"       |b:usemarks| is false
+"       |[bg]:usemarks| is false
 "       - implement choices.
 "         for instance, "T(args)" shall be understood as a constructor call in
 "         C++ and thus result into "T {var}(args)".
