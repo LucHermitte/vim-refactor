@@ -1,6 +1,6 @@
-			  --------------------
-			   lh-refactor v1.2.1
-			  --------------------
+                          --------------------
+                           lh-refactor v1.2.2
+                          --------------------
 
 Generic refactoring plugin for Vim
 
@@ -13,6 +13,6 @@ License       : plugin: GPLv3 (see http://www.gnu.org/licenses/gpl.txt)
 More Help At  : http://code.google.com/p/lh-vim/wiki/lhRefactor
 Vim script#???: http://www.vim.org/scripts/script.php?script_id=???
 Repository    :
-	svn checkout http://lh-vim.googlecode.com/svn/refactor/trunk refactor
+        svn checkout http://lh-vim.googlecode.com/svn/refactor/trunk refactor
 VAM           : lh-refactor
-	http://code.google.com/p/lh-vim/source/browse/map-tools/trunk/lh-refactor-addon-info.txt
+        http://code.google.com/p/lh-vim/source/browse/map-tools/trunk/lh-refactor-addon-info.txt
