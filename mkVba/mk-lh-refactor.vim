@@ -3,14 +3,14 @@
 " File:		mkVba/mk-lh-refactor.vim                            {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:	1.2.1
-let s:version = '1.2.1'
+" Version:	1.2.2
+let s:version = '1.2.2'
 " Created:	06th Nov 2007
 " Last Update:	$Date$
 "------------------------------------------------------------------------
 " Description:
 "       vimball archive builder for lh-refactor
-" 
+"
 "------------------------------------------------------------------------
 " Installation:
 "       Drop this file into {rtp}/mkVba
@@ -20,7 +20,7 @@ let s:version = '1.2.1'
 
 let s:project = 'lh-refactor'
 cd <sfile>:p:h
-try 
+try
   let save_rtp = &rtp
   let &rtp = expand('<sfile>:p:h:h').','.&rtp
   exe '33,$MkVimball! '.s:project.'-'.s:version

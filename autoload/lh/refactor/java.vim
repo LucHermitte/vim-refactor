@@ -3,13 +3,13 @@
 " File:         autoload/lh/refactor/java.vim                       {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:      1.2.0
+" Version:      1.2.2
 " Created:      20th Jan 2014
 " Last Update:  $Date$
 "------------------------------------------------------------------------
 " Description:
 "       Java settings for lh-refactor
-" 
+"
 "------------------------------------------------------------------------
 " }}}1
 "=============================================================================
@@ -19,7 +19,7 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 120
+let s:k_version = 122
 function! lh#refactor#java#version()
   return s:k_version
 endfunction
@@ -48,7 +48,7 @@ endfunction
 call lh#refactor#c#_load()
 
 " # Refactoring expression in a new variable     {{{2         -----------
-call lh#refactor#inherit('EV', 'c', 'cpp', 0)
+call lh#refactor#inherit('EV', 'c', 'java', 0)
 
 " # Extract Getter                               {{{2         -----------
 " Deep copy of the generic definition, in order to customize the result for Java
