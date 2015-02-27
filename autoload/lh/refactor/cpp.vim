@@ -3,13 +3,13 @@
 " File:         autoload/lh/refactor/cpp.vim                       {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:      1.2.0
+" Version:      1.2.3
 " Created:      20th Jan 2014
 " Last Update:  $Date$
 "------------------------------------------------------------------------
 " Description:
 "       C++ settings for lh-refactor
-" 
+"
 "------------------------------------------------------------------------
 " }}}1
 "=============================================================================
@@ -56,9 +56,7 @@ call lh#refactor#fill('EM', 'cpp', 'fsig',      lh#function#bind('lh#refactor#hf
 call lh#refactor#inherit('EM', 'c', 'java', 0)
 
 " # Refactoring expression in a new variable     {{{2         -----------
-call lh#refactor#inherit('EV', 'c', 'cpp', 1)
-" overide type for C++
-call lh#refactor#fill('EV', 'cpp', 'type',         lh#refactor#placeholder('auto', ' ')) " C++11
+call lh#refactor#inherit('EV', 'c', 'cpp', 0)
 
 " # Extract Type                                 {{{2         -----------
 call lh#refactor#inherit('ET', 'c', 'cpp', 1)

@@ -3,13 +3,13 @@
 " File:         autoload/lh/refactor/c.vim                       {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
-" Version:      1.2.0
+" Version:      1.2.3
 " Created:      20th Jan 2014
 " Last Update:  $Date$
 "------------------------------------------------------------------------
 " Description:
 "       C & familly settings for lh-refactor
-" 
+"
 "------------------------------------------------------------------------
 " }}}1
 "=============================================================================
@@ -64,7 +64,7 @@ call lh#refactor#fill('EV', 'c', '_use',         ['_varname'])
 call lh#refactor#fill('EV', 'c', '_definition',  ['mutable', 'type', '_varname', 'assign', '_value', 'eol'])
 call lh#refactor#fill('EV', 'c', 'assign',       ' = ')
 call lh#refactor#fill('EV', 'c', 'eol',          ';')
-call lh#refactor#fill('EV', 'c', 'type',         lh#refactor#placeholder('type', ' '))
+call lh#refactor#fill('EV', 'c', 'type',         lh#function#bind('lh#dev#types#deduce(v:1_._value) . " "'))
 call lh#refactor#fill('EV', 'c', 'mutable',      lh#function#bind(function('lh#refactor#const_key'), 'v:1_._varname'))
 
 " # Extract Type                                 {{{2         -----------
