@@ -36,6 +36,7 @@ autoload/lh/refactor/cs.vim
 autoload/lh/refactor/java.vim
 autoload/lh/refactor/javascript.vim
 autoload/lh/refactor/perl.vim
+autoload/lh/refactor/python.vim
 autoload/lh/refactor/php.vim
 autoload/lh/refactor/sh.vim
 autoload/lh/refactor/vim.vim
