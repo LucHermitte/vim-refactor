@@ -1,5 +1,5 @@
-*refactor.txt*          Language independent refactoring helpers (v1.0.0)
-*refactor.vim*          For Vim version 7.x.    Last change: $Date$
+*refactor.txt*          Language independent refactoring helpers (v1.2.3)
+*refactor.vim*          For Vim version 7.x.    Last change: 16th Mar 2015
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -31,11 +31,11 @@ PRESENTATION                                *refactor-presentation*       {{{1
 
 This plugin defines some refactoring oriented mappings and commands that applies
 to several different languages.
-The behavior of the facilities defined can be tweaked for any type of file. 
+The behavior of the facilities defined can be tweaked for any type of file.
 
 This plugin should be seen as a framework aimed at refactoring in Vim.
 As it is designed to support any language, it may not be as adapted as a plugin
-specifically designed for a particular language could be. 
+specifically designed for a particular language could be.
 
 
 ==============================================================================
@@ -79,7 +79,7 @@ This command inserts, back into the current buffer, the code previously
 extracted. The code is put back as a function. The signature of the function is
 automatically adapted to fit the language in which the code is written.
 
-The new function will be put after the current line in which the cursor is. 
+The new function will be put after the current line in which the cursor is.
 If the commanded is "banged" (!), the function will be inserted before the
 current line.
 
@@ -134,7 +134,7 @@ Complex examples~
       \  "WHICH('CONFIRM', 'nature of the routine? ', 'function\nprocedure', 1)"))
     " 1.2- then defines what replaces the code "deleted" ; as the replacement
     "      is some active code, lh#function#bind is used
-    call lh#refactor#fill('EM', 'pascal', 'call',      
+    call lh#refactor#fill('EM', 'pascal', 'call',
     \ lh#function#bind("(v:1_.kind_ == 'function' ? Marker_Txt('variable').' := ' : '') . lh#refactor#hfunc(v:1_._fname).';'.Marker_Txt()", '_fname'))
 
 
@@ -167,7 +167,7 @@ in the hooks "call", "return", and "begin")
 EXTRACT-TYPE REFACTORING                    *refactor-extract-type*       {{{1
 
 This refactoring consists in extracting a complex type expression in the code,
-and define a new type. 
+and define a new type.
 
 ------------------------------------------------------------
 Typical steps to extract a type~
@@ -226,7 +226,7 @@ In order to define hooks for this refactoring, the function
 EXTRACT-VARIABLE REFACTORING                *refactor-extract-variable*    {{{1
 
 This refactoring consists in extracting a complex variable expression in the code,
-and define a new variable. 
+and define a new variable.
 
 ------------------------------------------------------------
 Typical steps to extract a variable~
@@ -324,7 +324,7 @@ In order to define hooks for this refactoring, the function
     "_definition" that describes how the extracted accessor/mutator
       definition is built.
     It takes the following parameters (|refactoring-properties|): (this will
-    changehttp://code.google.com/p/lh-vim/wiki/license!)
+    change!)
     - "_ppt_name"
     - "_name"
     - "_type"
@@ -362,7 +362,7 @@ This refactoring is of course restricted to OO Languages.
 (propose a way to tag the functions to completely extract, to have in both
 classes (in this case, a class may delegate its work to the other (relations
 between the classes (inheritance, composition, reference, .....))), or just keep
-it where it is) 
+it where it is)
 
 Issues of where the code must be put (c++), ...
 
@@ -448,7 +448,7 @@ If a hook is shared, overiding it will override the hook for all the filetypes
 sharing it.
 
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *refactoring-property*
                                                 *refactoring-properties*
 Refactoring properties~
@@ -462,7 +462,7 @@ New properties can be added to a refactoring under evaluation thanks to
 |lh#refactor#let()|.
 
 
-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                                                 *refactor-functors*
 Helper functors~
 
@@ -553,12 +553,11 @@ And of course, many other refactorings need to be implemented.
 License(s)~
 lh-refactor code is under GPLv3 license.
 Source code produced with lh-refactor has a license exception, see
-<http://code.google.com/p/lh-vim/wiki/License>
+<http://github.com/LucHermitte/vim-refactor.License.md>
 
 
 ==============================================================================
- © Luc Hermitte, 2005-2012 <http://code.google.com/p/lh-vim/>
- $Id$
- VIM: let b:VS_language = 'american' 
+ © Luc Hermitte, 2005-2015 <http://github.com/LucHermitte/vim-refactor>, CC-BY-SA 3.0 {{{1
+ VIM: let b:VS_language = 'american'
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
  vim600:fdm=marker:
