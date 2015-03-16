@@ -30,7 +30,7 @@ This has to be done with `<C-X>p` and `<C-X>P`.
 
 ## Installation
   * Requirements: Vim 7.+, [lh-vim-lib](http://github.com/LucHermitte/lh-vim-lib), [lh-brackets](http://github.com/LucHermitte/lh-brackets), [lh-dev](http://github.com/LucHermitte/lh-dev) (and thus [lh-tags](http://github.com/LucHermitte/lh-tags))
-  * With [vim-addon-manager](https://github.com/MarcWeber/vim-addon-manager), install mu-template@lh. This is the preferred method because of the various dependencies.
+  * With [vim-addon-manager](https://github.com/MarcWeber/vim-addon-manager), install lh-refactor. This is the preferred method because of the various dependencies.
 ```vim
 ActivateAddons lh-refactor
 ```
