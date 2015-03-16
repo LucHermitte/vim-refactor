@@ -1,6 +1,6 @@
 # Features
 
-lh-refactor is a generic refactoring plugin. 
+lh-refactor is a generic refactoring plugin.
 
 So far it supports the following refactorings (v0.2.2):
   * Extract Function,
