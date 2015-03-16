@@ -1,6 +1,6 @@
 # Features
 
-lh-refactor is a generic refactoring plugin.
+lh-refactor is a generic refactoring plugin. 
 
 So far it supports the following refactorings (v0.2.2):
   * Extract Function,
@@ -57,3 +57,5 @@ Bundle 'LucHermitte/vim-refactor'
     * Generate accessor and mutator (`:ADDATTRIBUTE`),
     * Generate default body given a function signature (`:GOTOIMPL`)
   * [Refactoring.com](http://www.refactoring.com/catalog/index.html)
+
+[![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
