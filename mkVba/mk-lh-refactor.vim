@@ -4,10 +4,10 @@
 "		<URL:http://github.com/LucHermitte/vim-refactor>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/vim-refactor/License.md>
-" Version:	1.2.4
-let s:version = '1.2.4'
+" Version:	1.2.5
+let s:version = '1.2.5'
 " Created:	06th Nov 2007
-" Last Update:	18th Nov 2015
+" Last Update:	21st Dec 2015
 "------------------------------------------------------------------------
 " Description:
 "       vimball archive builder for lh-refactor
@@ -38,6 +38,7 @@ autoload/lh/refactor.vim
 autoload/lh/refactor/c.vim
 autoload/lh/refactor/cpp.vim
 autoload/lh/refactor/cs.vim
+autoload/lh/refactor/gui_em.vim
 autoload/lh/refactor/java.vim
 autoload/lh/refactor/javascript.vim
 autoload/lh/refactor/perl.vim
