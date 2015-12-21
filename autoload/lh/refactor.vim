@@ -7,9 +7,9 @@
 " Created:      31st Oct 2008
 " Last Update:  $Date$
 "------------------------------------------------------------------------
-" Description:  
+" Description:
 "       Language independent refactoring suite
-" 
+"
 "------------------------------------------------------------------------
 " Installation:
 "       Requires Vim 7.1+, lh-vim-lib v2.2.1+, and lh-dev v0.0.3 (for setter/getter)
@@ -17,7 +17,7 @@
 "       installed to implement a smart Extract Method refactoring.
 "       Drop this file into {rtp}/autoload/lh
 "
-" History:      
+" History:
 "       v0.1.0 New kernel built on top of lh#function
 "       v0.2.0 Smart Extract Method refactoring
 "       v0.2.1 Extract shell variables
@@ -26,11 +26,11 @@
 "              New helper functions lh#refactor#snippet() and
 "              lh#refactor#opt_snippet()
 "       v1.0.0 GPLv3
-" 	v1.1.0 FixRealloc
-" 	v1.2.0 Can be extended thanks to external files
-" 	       Bugs fixed regarding snippets for *extracting variables*.
-"              
-" TODO:         
+"       v1.1.0 FixRealloc
+"       v1.2.0 Can be extended thanks to external files
+"              Bugs fixed regarding snippets for *extracting variables*.
+"
+" TODO:
 "       - support <++> as placeholder marks, and automatically convert them to
 "       the current ones
 "       - jump to the first placeholder
@@ -50,7 +50,7 @@ set cpo&vim
 " # Helper functions                             {{{2         -----------
 " s:ConstKey(varName)                                       {{{3
 function! lh#refactor#const_key(varName)
-  let res = s:IsCConst(a:varName) ? (exists('c_no_c99') ? '#define ' : 'const ') : '' 
+  let res = s:IsCConst(a:varName) ? (exists('c_no_c99') ? '#define ' : 'const ') : ''
   return res
 endfunction
 " s:IsCConst(varName)                                       {{{3
@@ -67,7 +67,7 @@ endfunction
 " parenthesis in the text, nothing is added.
 " Valable with most languages: C, vimL, ...
 " @param a:dict._fname -> function name
-" @param a:key         -> parameter in a:dict.{a:key} 
+" @param a:key         -> parameter in a:dict.{a:key}
 function! lh#refactor#hfunc(dict, params)
   " echomsg "lh#refactor#hfunc(".string(a:dict).' ## '.string(a:params).')'
   let result = a:dict._fname
@@ -103,7 +103,7 @@ endfunction
 " lh#refactor#placeholder(text [, extra])                   {{{3
 " todo: option to return nothing when |b:usemarks| is false
 function! lh#refactor#placeholder(text, ...)
-  let f = lh#function#bind('Marker_Txt('.string(a:text).')'. ((a:0) ? '.'.string(a:1 ): ''))
+  let f = lh#function#bind('lh#marker#txt('.string(a:text).')'. ((a:0) ? '.'.string(a:1 ): ''))
   return f
 endfunction
 
@@ -147,7 +147,7 @@ function! s:CheckUsed(variables, lines)
 endfunction
 
 function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lFunction)
-  try 
+  try
     call lh#dev#start_tag_session()
 
     let extr_fn_name = a:extr_fn_name
@@ -181,9 +181,9 @@ function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lF
     " 2.2- if the function is actually a member/function class, check whether
     " its member are required by the extracted part
     let class
-	  \ = has_key(fn.fn, 'class')  ? fn.fn.class
-	  \ : has_key(fn.fn, 'struct') ? fn.fn.struct
-	  \ : ''
+          \ = has_key(fn.fn, 'class')  ? fn.fn.class
+          \ : has_key(fn.fn, 'struct') ? fn.fn.struct
+          \ : ''
     if !empty(class)
       call s:Verbose("CLASS=".class)
       let members = lh#dev#class#members(class)
@@ -196,15 +196,15 @@ function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lF
       " call s:Verbose("MEMBERS=".join(lh#list#transform(members, [], 'v:1_.name'), ','))
       let required_members = s:CheckUsed(members, extracted_lines)
       if !empty(required_members)
-	" needs to be in a class
-	let lClass = [class]
+        " needs to be in a class
+        let lClass = [class]
       else
-	" may also be in a class
-	let lClass = [class, '']
+        " may also be in a class
+        let lClass = [class, '']
       endif
       call s:Verbose("REQUIRED MEMBERS=".
-	    \ join(lh#list#transform(required_members, [],
-	    \ 'v:1_.name'), ','))
+            \ join(lh#list#transform(required_members, [],
+            \ 'v:1_.name'), ','))
     else
       " Being in a class makes no sense ?
       let lClass = []
@@ -212,7 +212,7 @@ function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lF
 
 
     " 2.3- if a return statement was extracted, forward it
-    let return_re = lh#dev#option#get('return_pattern', &ft, '\<return\>') 
+    let return_re = lh#dev#option#get('return_pattern', &ft, '\<return\>')
     let first_return_line = lh#list#match(extracted_lines, return_re)
 
     " 2.4- sort the variables extracted reused after the extracted part
@@ -242,7 +242,7 @@ function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lF
           \ join(lh#list#transform(after_variables, [],
           \ '(v:1_.line) .":".(v:1_.name)'), ','))
     " - if first_return_line != -1 && original return type != void
-    "  => must reuse the return type, if it means something to the {ft} 
+    "  => must reuse the return type, if it means something to the {ft}
     "  =/> we can also propose to use tuples, structs, lists, ...
     call s:Verbose("RETURN=".first_return_line.':')
     " - plus beware of required parameters a that are modified, and used in the
@@ -270,7 +270,7 @@ function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lF
 
     let data = {
           \ 'orig_fn'         : fn.fn,
-	  \ 'class'           : lClass,
+          \ 'class'           : lClass,
           \ 'extr_fn'         : { 'name': extr_fn_name},
           \ 'parameters'      : parameters,
           \ 'orig_lines'      : fn.lines,
@@ -320,11 +320,11 @@ function! lh#refactor#_do_EM_callback(data)
   " Build call
   let sRealParams = lh#dev#option#call('function#_build_real_params_list', &ft, a:data.parameters.list)
   echomsg "real params: ".sRealParams
-  
+
 
   let fname_full = !empty(a:data.class)
-	\ ? join([a:data.class[0], a:data.extr_fn.name], lh#dev#class#sep_decl())
-	\ : a:data.extr_fn.name
+        \ ? join([a:data.class[0], a:data.extr_fn.name], lh#dev#class#sep_decl())
+        \ : a:data.extr_fn.name
 
   let params    = {
         \ '_fname'        : a:data.extr_fn.name,
@@ -382,9 +382,9 @@ function! lh#refactor#inherit(refactoring, ft_parent, ft_child, deepcopy)
   let def = refactoring
     if has_key(def, a:ft_parent)
       if a:deepcopy
-        let def[a:ft_child] = deepcopy(def[a:ft_parent]) 
+        let def[a:ft_child] = deepcopy(def[a:ft_parent])
       else
-        let def[a:ft_child] = def[a:ft_parent] 
+        let def[a:ft_child] = def[a:ft_parent]
       endif
     endif
   " endfor
@@ -399,13 +399,13 @@ call lh#refactor#fill('EM', 'pascal', '_call',      ['ask_kind', 'call'])
 call lh#refactor#fill('EM', 'pascal', 'ask_kind',   lh#refactor#let('kind_', "WHICH('CONFIRM', 'nature of the routine? ', 'function\nprocedure', 1)"))
 call lh#refactor#fill('EM', 'pascal', '_function',  ['begin', '_body', 'return', 'end'])
 
-call lh#refactor#fill('EM', 'pascal', 'call',       lh#function#bind("(v:1_.kind_ == 'function' ? Marker_Txt('variable').' := ' : '') . lh#refactor#hfunc(v:1_, '_real_params').';'.Marker_Txt()", '_fname'))
+call lh#refactor#fill('EM', 'pascal', 'call',       lh#function#bind("(v:1_.kind_ == 'function' ? lh#marker#txt('variable').' := ' : '') . lh#refactor#hfunc(v:1_, '_real_params').';'.lh#marker#txt()", '_fname'))
 call lh#refactor#fill('EM', 'pascal', 'begin',      ['kind_', 'SPACE', 'fsig', 'NL', 'vars', 'NL', 'k_begin', 'NL'])
 call lh#refactor#fill('EM', 'pascal', 'vars',       lh#refactor#placeholder('var', ';'))
 call lh#refactor#fill('EM', 'pascal', 'fsig',       lh#function#bind('lh#refactor#hfunc(v:1_, "_formal_params")'))
 call lh#refactor#fill('EM', 'pascal', 'SPACE',      " ")
 call lh#refactor#fill('EM', 'pascal', 'NL',         "\n")
-call lh#refactor#fill('EM', 'pascal', 'return',     lh#function#bind("v:1_.kind_ == 'function' ? (v:1_._fname) . ' := '.Marker_Txt('value').';\n' : ''"))
+call lh#refactor#fill('EM', 'pascal', 'return',     lh#function#bind("v:1_.kind_ == 'function' ? (v:1_._fname) . ' := '.lh#marker#txt('value').';\n' : ''"))
 call lh#refactor#fill('EM', 'pascal', 'end',        ['k_end', 'placeholder', 'NL'])
 call lh#refactor#fill('EM', 'pascal', 'k_begin',    "begin")
 call lh#refactor#fill('EM', 'pascal', 'k_end',      "end")
@@ -636,7 +636,7 @@ function! lh#refactor#extract_variable(mayabort, variableName) range abort
     let continue = CONFIRM("Replace other occurrences of `".@a."' ?", "&Yes\n&No", 1)
     if continue == 1
       let p = getpos('.')
-      try 
+      try
         :exe ':%s/\V'.escape(@a,'/\').'/'.sUse.'/cg'
       finally
         call setpos('.',p)
@@ -656,8 +656,8 @@ endfunction
 function! lh#refactor#default_varname()
   let expression = lh#visual#selection()
   " try to determine type or any other meaningful thing (may not be possible...)
-  try 
-    let lVarNameData = s:Option(&ft, 'EV_name', '_naming_policy', '') 
+  try
+    let lVarNameData = s:Option(&ft, 'EV_name', '_naming_policy', '')
   catch /.*/
     " no key => default a default empty name
     return ""
@@ -695,7 +695,7 @@ function! lh#refactor#extract_type(mayabort, typeName) range abort
     let continue = CONFIRM("Replace other occurrences of `".@a."' ?", "&Yes\n&No", 1)
     if continue == 1
       let p = getpos('.')
-      try 
+      try
         :exe ':%s/\V'.escape(@a,'/\').'/'.sUse.'/cg'
       finally
         call setpos('.',p)
@@ -725,7 +725,7 @@ function! lh#refactor#extract_getter()
     " Prepare the function body
     let params    = {
           \ '_ppt_name': name,
-          \ '_name': attribute.name, '_type': attribute.type, 
+          \ '_name': attribute.name, '_type': attribute.type,
           \ '_static': (has_key(attribute,'static') && attribute.static ? 'static ' : ''),
           \ '_fname': getter_name, '_void': ''}
     if has_key(attribute, 'visibility')
@@ -764,7 +764,7 @@ function! lh#refactor#extract_setter()
     " Prepare the function body
     let params    = {
           \ '_ppt_name': name,
-          \ '_name': attribute.name, '_type': attribute.type, 
+          \ '_name': attribute.name, '_type': attribute.type,
           \ '_static': (has_key(attribute,'static') && attribute.static ? 'static ' : ''),
           \ '_fname': setter_name, '_args': sFormal,
           \ '_instruction': instruction
@@ -803,7 +803,7 @@ function! lh#refactor#fix_realloc() abort range
   endtry
 
   let [all, lhs, type, realloc, rhs, size, in_macro; tail] = matchlist(line,
-	\ '^\s*\(.\{-}\)\s*=\s*\((.\{-}\)\=\s*\(\k*realloc\)\s*(\s*\(.\{-}\)\s*,\s*\(.\{-}\)\s*);\s*\(\\\)\=')
+        \ '^\s*\(.\{-}\)\s*=\s*\((.\{-}\)\=\s*\(\k*realloc\)\s*(\s*\(.\{-}\)\s*,\s*\(.\{-}\)\s*);\s*\(\\\)\=')
   if (lhs != rhs)
     throw "the pointers used in realloc mismatch: <".lhs."> != <".rhs.">. Aborting"
     return
@@ -821,25 +821,25 @@ function! lh#refactor#fix_realloc() abort range
   let lhs = lhs_prefix . lh#dev#naming#variable(matchstr(lhs, '.\{-}\zs\k\+$'))
   " count=number of element * sizeof, or size
   let cnt = (size =~ 'sizeof')
-	\ ? substitute(size, '\s*\(\*\s*\)\=sizeof([^)]*)\s*\(\*\s*\)\=', '', '')
-	\ : size
+        \ ? substitute(size, '\s*\(\*\s*\)\=sizeof([^)]*)\s*\(\*\s*\)\=', '', '')
+        \ : size
   let args = {
-	\  'ptr'    : rhs
-	\, 'lhs'    : lhs
-	\, 'type'   : type
-	\, 'count'  : cnt
-	\, 'size'   : size
-	\, 'realloc': realloc
-	\, 'free'   : free_function
-	\, 'macro'  : in_macro
-	\, 'false'  : false
-	\ }
+        \  'ptr'    : rhs
+        \, 'lhs'    : lhs
+        \, 'type'   : type
+        \, 'count'  : cnt
+        \, 'size'   : size
+        \, 'realloc': realloc
+        \, 'free'   : free_function
+        \, 'macro'  : in_macro
+        \, 'false'  : false
+        \ }
   echomsg string(args)
   exe a:firstline.','.a:lastline.'delete _'
   call append(a:firstline-1, '')
   call setpos('.', [0, a:firstline, 1, 1])
   call lh#mut#expand_and_jump(0, 'c/realloc', args)
-  return 
+  return
 endfunction
 
 " lh#refactor#default_varname()                             {{{2
@@ -848,8 +848,8 @@ endfunction
 function! lh#refactor#default_varname()
   let expression = lh#visual#selection()
   " try to determine type or any other meaningful thing (may not be possible...)
-  try 
-    let lVarNameData = s:Option(&ft, 'EV_name', '_naming_policy', '') 
+  try
+    let lVarNameData = s:Option(&ft, 'EV_name', '_naming_policy', '')
   catch /.*/
     " no key => default a default empty name
     return ""
