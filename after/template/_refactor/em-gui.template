@@ -1,0 +1,20 @@
+VimL: " VFT form for refactor extract method
+VimL: let s:value_start  = '¡'
+VimL: let s:value_end    = '¡'
+VimL: let s:marker_open  = '<+'
+VimL: let s:marker_close = '+>'
+VimL: let s:data = s:Args()[0]
+VImL: "
+
+			    Extracting Method Form 
+	      --------------------------------------------------
+
+  Original  Function: ¡s:data.orig_fn.name¡()
+  Extracted Function: ¡s:data.extr_fn.name¡()		<Rename>|RENAME|
+
+  Returning: [_____________|v] |return|
+  Parameters:
+    [dir] formal parameter           <-          real argument
+¡s:data.parameters.gui()¡
+
+                   <Ok>|OK|                         <Abort>|ABORT|

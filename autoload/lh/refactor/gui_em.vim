@@ -1,11 +1,10 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/refactor/gui_em.vim                   {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "		<URL:http://code.google.com/p/lh-vim/>
 " Version:      0.2.0
 " Created:      01st Jun 2010
-" Last Update:  $Date$
+" Last Update:  22nd Dec 2015
 "------------------------------------------------------------------------
 " Description:
 "       «description»
