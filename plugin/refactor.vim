@@ -1,12 +1,12 @@
 "=============================================================================
-" File:		refactor.vim                                           {{{1
-" Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
-" Version:	v1.2.0
-" Created:	11th Mar 2005
-" Last Update:	02nd Mar 2012
+" File:         refactor.vim                                           {{{1
+" Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
+"               <URL:http://code.google.com/p/lh-vim/>
+" Version:      v1.2.6
+" Created:      11th Mar 2005
+" Last Update:  15th Mar 2017
 "------------------------------------------------------------------------
-" Description:	Some refactoring oriented mappings and commands
+" Description:  Some refactoring oriented mappings and commands
 "
 "
 " Refactoring Lines In A New Function:
@@ -22,45 +22,47 @@
 "
 "------------------------------------------------------------------------
 " Installation:
-" 	Drop this file into one of your {rtp}/plugin/ directory.
+"       Drop this file into one of your {rtp}/plugin/ directory.
 "
-" 	Adding new langages ....
+"       Adding new langages ....
 "
-" 	Requires: vim7, lh-vim-lib, lh-dev, lh-tags
+"       Requires: vim7, lh-vim-lib, lh-dev, lh-tags
 "
 " History:
-" 	v1.2.0: 20th Jan 2014
-" 	        * Can be extended thanks to external files
-" 	        * Bugs fixed regarding snippets for *extracting variables*.
-" 	v1.1.1: 18th Dec 2013
-" 	        * Extract commands fixed to correctly process the visual
-" 	          selection
-" 	v1.1.0: * FixRealloc
-" 	v1.0.0: GPLv3
-" 	v0.2.2:	Feb - 23rd Aug 2011
-" 	        * <c-x>g and <c-x>s to prepare getters and setters
-" 	v0.0.4:	31st Oct 2007 - 08th Sep 2009
-" 		* Default variable names
-" 		* Relies on lh#functors
-" 		* Extract variable can change several occurences of the
-" 		expression to the new value. Todo: take the scope into account,
-" 		support, OO attributes, global variables, local variables, ...
-" 		(filetype specific).
+"       v1.2.6: 15th Mar 2017
+"               * Deprecate `CONFIRM()` & co
+"       v1.2.0: 20th Jan 2014
+"               * Can be extended thanks to external files
+"               * Bugs fixed regarding snippets for *extracting variables*.
+"       v1.1.1: 18th Dec 2013
+"               * Extract commands fixed to correctly process the visual
+"                 selection
+"       v1.1.0: * FixRealloc
+"       v1.0.0: GPLv3
+"       v0.2.2: Feb - 23rd Aug 2011
+"               * <c-x>g and <c-x>s to prepare getters and setters
+"       v0.0.4: 31st Oct 2007 - 08th Sep 2009
+"               * Default variable names
+"               * Relies on lh#functors
+"               * Extract variable can change several occurences of the
+"               expression to the new value. Todo: take the scope into account,
+"               support, OO attributes, global variables, local variables, ...
+"               (filetype specific).
 "
-" 	v0.0.3:	30th Aug 2007 - 31st Oct 2007 
-" 		* :ExtractFunction can abort if options are missing
-" 		* fix is_like_EM_
-" 		* Extract variable defined (see tip tip1171)
-" 		* Extract type defined
-" 		* Mappings v_CTRL-X_f, v_CTRL-X_v, v_CTRL-X-t, n_CTR-X_p, n_CTRL-X_P
-" 		* Mappings will abort on empty names
+"       v0.0.3: 30th Aug 2007 - 31st Oct 2007
+"               * :ExtractFunction can abort if options are missing
+"               * fix is_like_EM_
+"               * Extract variable defined (see tip tip1171)
+"               * Extract type defined
+"               * Mappings v_CTRL-X_f, v_CTRL-X_v, v_CTRL-X-t, n_CTR-X_p, n_CTRL-X_P
+"               * Mappings will abort on empty names
 "
-" 	v0.0.2:	24th Mar 2005
-" 		* :PutExtractedFunction accepts <bang>
+"       v0.0.2: 24th Mar 2005
+"               * :PutExtractedFunction accepts <bang>
 "
-" 	v0.0.1:	11th Mar 2005
-" 		* Initial version: :ExtractFunction, :PutExtractedFunction (see
-" 		tip 589)
+"       v0.0.1: 11th Mar 2005
+"               * Initial version: :ExtractFunction, :PutExtractedFunction (see
+"               tip 589)
 "
 " TODO:
 " * documentation
@@ -120,15 +122,15 @@ command! -range -nargs=1 ExtractType
 command! -nargs=0 -bang  PutExtracted
       \ :call lh#refactor#put_extracted_last('')
 
-vnoremap <silent> <c-x>f :call lh#refactor#extract_function(1,INPUT("Name for the function to extract: "))<cr>
+vnoremap <silent> <c-x>f :call lh#refactor#extract_function(1,lh#ui#input("Name for the function to extract: "))<cr>
 
 vnoremap <silent> <Plug>RefactorExtractVariable
-      \ :call lh#refactor#extract_variable(1,INPUT("Name for the variable to extract: ", lh#refactor#default_varname()))<cr>
+      \ :call lh#refactor#extract_variable(1,lh#ui#input("Name for the variable to extract: ", lh#refactor#default_varname()))<cr>
 if !hasmapto('<Plug>RefactorExtractVariable', 'v')
   vmap <unique> <c-x>v <Plug>RefactorExtractVariable
 endif
 vnoremap <silent> <Plug>RefactorExtractType
-      \ :call lh#refactor#extract_type(1,INPUT("Name for the type to extract: "))<cr>
+      \ :call lh#refactor#extract_type(1,lh#ui#input("Name for the type to extract: "))<cr>
 if !hasmapto('<Plug>RefactorExtractType', 'v')
   vmap <unique> <c-x>t <Plug>RefactorExtractType
 endif
@@ -161,7 +163,7 @@ endif
 " Valable with most languages: C, vimL, ...
 function! RefactorH_func(sig)
   if stridx(a:sig, '(') < 0
-    return a:sig . '(' . Marker_Txt('Parameters') . ')'
+    return a:sig . '(' . lh#marker#txt('Parameters') . ')'
   else
     return a:sig
   endif
@@ -179,11 +181,11 @@ endfunction
 " C, C++, Java                                             {{{3
 function! Refactor_EM_c(part, ...)
   if     a:part == 'begin'
-    return Marker_Txt('ReturnType').' '.RefactorH_func(a:1) . "\n{"
+    return lh#marker#txt('ReturnType').' '.RefactorH_func(a:1) . "\n{"
   elseif a:part == 'end'
-    return "\n}".Marker_Txt()."\n"
+    return "\n}".lh#marker#txt()."\n"
   elseif a:part == 'call'
-    return RefactorH_func(a:1).Marker_Txt().';'.Marker_Txt()
+    return RefactorH_func(a:1).lh#marker#txt().';'.lh#marker#txt()
   endif
 endfunction
 
@@ -227,16 +229,16 @@ function! Refactor_EM_pascal(part,...)
       return 'procedure '.RefactorH_func(a:1). "\nbegin"
     else " function
       return 'function '.RefactorH_func(a:1). ": ".
-	    \ Marker_Txt('ReturnType'). "\nbegin"
+            \ lh#marker#txt('ReturnType'). "\nbegin"
     endif
   elseif a:part == 'end'
-    return ((s:type=='f') ? s:FuncName(a:1).' := '.Marker_Txt('Value')."\n": '')
-	  \ . 'end'
+    return ((s:type=='f') ? s:FuncName(a:1).' := '.lh#marker#txt('Value')."\n": '')
+          \ . 'end'
   elseif a:part == 'call'
     if s:type == 'p'
       return RefactorH_func(a:1)
     else " function
-      return Marker_Txt('Result').' := '.RefactorH_func(a:1)
+      return lh#marker#txt('Result').' := '.RefactorH_func(a:1)
     endif
   endif
 endfunction

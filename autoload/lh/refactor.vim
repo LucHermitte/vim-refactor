@@ -1,11 +1,10 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/refactor.vim                                 {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://code.google.com/p/lh-vim/>
-" Version:      1.2.0
+" Version:      1.2.6
 " Created:      31st Oct 2008
-" Last Update:  $Date$
+" Last Update:  15th Mar 2017
 "------------------------------------------------------------------------
 " Description:
 "       Language independent refactoring suite
@@ -29,6 +28,7 @@
 "       v1.1.0 FixRealloc
 "       v1.2.0 Can be extended thanks to external files
 "              Bugs fixed regarding snippets for *extracting variables*.
+"       v1.2.6 Deprecate `CONFIRM()` & co
 "
 " TODO:
 "       - support <++> as placeholder marks, and automatically convert them to
@@ -396,7 +396,7 @@ endfunction
 " # Extract Method                               {{{2         -----------
 " Pascal                                                    {{{3         -----------
 call lh#refactor#fill('EM', 'pascal', '_call',      ['ask_kind', 'call'])
-call lh#refactor#fill('EM', 'pascal', 'ask_kind',   lh#refactor#let('kind_', "WHICH('CONFIRM', 'nature of the routine? ', 'function\nprocedure', 1)"))
+call lh#refactor#fill('EM', 'pascal', 'ask_kind',   lh#refactor#let('kind_', "lh#ui#which('lh#ui#confirm', 'nature of the routine? ', 'function\nprocedure', 1)"))
 call lh#refactor#fill('EM', 'pascal', '_function',  ['begin', '_body', 'return', 'end'])
 
 call lh#refactor#fill('EM', 'pascal', 'call',       lh#function#bind("(v:1_.kind_ == 'function' ? lh#marker#txt('variable').' := ' : '') . lh#refactor#hfunc(v:1_, '_real_params').';'.lh#marker#txt()", '_fname'))
@@ -633,7 +633,7 @@ function! lh#refactor#extract_variable(mayabort, variableName) range abort
     let s:variable = sDefinition
     let s:last_refactor='variable'
 
-    let continue = CONFIRM("Replace other occurrences of `".@a."' ?", "&Yes\n&No", 1)
+    let continue = lh#ui#confirm("Replace other occurrences of `".@a."' ?", "&Yes\n&No", 1)
     if continue == 1
       let p = getpos('.')
       try
@@ -692,7 +692,7 @@ function! lh#refactor#extract_type(mayabort, typeName) range abort
     let s:type = sDefinition
     let s:last_refactor='type'
 
-    let continue = CONFIRM("Replace other occurrences of `".@a."' ?", "&Yes\n&No", 1)
+    let continue = lh#ui#confirm("Replace other occurrences of `".@a."' ?", "&Yes\n&No", 1)
     if continue == 1
       let p = getpos('.')
       try
