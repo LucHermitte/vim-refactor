@@ -58,7 +58,7 @@ call lh#refactor#fill('EV', 'javascript', 'eol',          ';')
 " ## Internal functions {{{1
 " Function: lh#refactor#javascript#_load() {{{2
 " Fake function to have the javascript settings loaded
-function! lh#refactor#javascript#_load()
+function! lh#refactor#javascript#_load() abort
 endfunction
 
 " }}}1

@@ -69,7 +69,7 @@ call lh#refactor#inherit('Es', 'java', 'cs', 0)
 " ## Internal functions {{{1
 " Function: lh#refactor#cs#_load() {{{2
 " Fake function to have the C# settings loaded
-function! lh#refactor#cs#_load()
+function! lh#refactor#cs#_load() abort
 endfunction
 
 " }}}1

@@ -82,7 +82,7 @@ call lh#refactor#fill('ET', 'c', 'eol',          ';')
 " ## Internal functions {{{1
 " Function: lh#refactor#c#_load() {{{2
 " Fake function to have the c settings loaded
-function! lh#refactor#c#_load()
+function! lh#refactor#c#_load() abort
 endfunction
 
 " }}}1

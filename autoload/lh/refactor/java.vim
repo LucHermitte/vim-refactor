@@ -69,7 +69,7 @@ call lh#refactor#fill('Es', 'java',   'prefix_',       lh#refactor#placeholder('
 " ## Internal functions {{{1
 " Function: lh#refactor#java#_load() {{{2
 " Fake function to have the java settings loaded
-function! lh#refactor#java#_load()
+function! lh#refactor#java#_load() abort
 endfunction
 
 " }}}1

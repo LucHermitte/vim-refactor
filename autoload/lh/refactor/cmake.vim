@@ -56,7 +56,7 @@ call lh#refactor#fill('EV', 'cmake', '_definition',  lh#refactor#snippet('SET(${
 " ## Internal functions {{{1
 " Function: lh#refactor#cmake#_load() {{{2
 " Fake function to have the vim settings loaded
-function! lh#refactor#cmake#_load()
+function! lh#refactor#cmake#_load() abort
 endfunction
 
 " }}}1

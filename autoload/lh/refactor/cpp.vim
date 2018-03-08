@@ -78,7 +78,7 @@ call lh#refactor#inherit('Es', '_oo_c_', 'cpp', 0)
 " ## Internal functions {{{1
 " Function: lh#refactor#cpp#_load() {{{2
 " Fake function to have the cpp settings loaded
-function! lh#refactor#cpp#_load()
+function! lh#refactor#cpp#_load() abort
 endfunction
 
 " }}}1

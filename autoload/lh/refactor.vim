@@ -51,14 +51,14 @@ set cpo&vim
 
 " # Helper functions                             {{{2         -----------
 " s:ConstKey(varName)                                       {{{3
-function! lh#refactor#const_key(varName)
+function! lh#refactor#const_key(varName) abort
   let res = s:IsCConst(a:varName) ? (exists('c_no_c99') ? '#define ' : 'const ') : ''
   return res
 endfunction
 " s:IsCConst(varName)                                       {{{3
 " Tells whether the variable name looks like a constant (all upper case / start
 " with k_)
-function! s:IsCConst(variableName)
+function! s:IsCConst(variableName) abort
   let isConst = a:variableName =~ '^k_\|\u[A-Z0-9_]*'
   return isConst
 endfunction
@@ -70,7 +70,7 @@ endfunction
 " Valable with most languages: C, vimL, ...
 " @param a:dict._fname -> function name
 " @param a:key         -> parameter in a:dict.{a:key}
-function! lh#refactor#hfunc(dict, params)
+function! lh#refactor#hfunc(dict, params) abort
   " echomsg "lh#refactor#hfunc(".string(a:dict).' ## '.string(a:params).')'
   let result = a:dict._fname
   if has_key(a:dict, a:params)
@@ -79,7 +79,7 @@ function! lh#refactor#hfunc(dict, params)
   return result
 endfunction
 
-function! lh#refactor#hfunc_def_full(dict, params)
+function! lh#refactor#hfunc_def_full(dict, params) abort
   let result = a:dict._fname_full
   if has_key(a:dict, a:params)
     let result .= '('. (a:dict[a:params]) . ')'
@@ -89,7 +89,7 @@ endfunction
 
 " lh#refactor#_add_key(dict, varname, value)                {{{3
 " internal, but addressable function.
-function! lh#refactor#_add_key(dict, varname, value)
+function! lh#refactor#_add_key(dict, varname, value) abort
   " echo "dict".string(a:dict)
   " echo "varname".a:varname
   let a:dict[a:varname] = a:value
@@ -97,28 +97,28 @@ function! lh#refactor#_add_key(dict, varname, value)
 endfunction
 
 " lh#refactor#let(varname, value)                           {{{3
-function! lh#refactor#let(varname, value)
+function! lh#refactor#let(varname, value) abort
   let f = lh#function#bind("lh#refactor#_add_key(v:1_, ".string(a:varname).','.(a:value).")")
   return f
 endfunction
 
 " lh#refactor#placeholder(text [, extra])                   {{{3
 " todo: option to return nothing when |b:usemarks| is false
-function! lh#refactor#placeholder(text, ...)
+function! lh#refactor#placeholder(text, ...) abort
   let f = lh#function#bind('lh#marker#txt('.string(a:text).')'. ((a:0) ? '.'.string(a:1 ): ''))
   return f
 endfunction
 
 " lh#refactor#snippet(text)                                 {{{3
 " todo: option to return nothing when |b:usemarks| is false
-function! lh#refactor#snippet(text)
+function! lh#refactor#snippet(text) abort
   let text = '"' . substitute(a:text, '${\(\k\{-}\)}', '".v:1_.\1."', 'g') . '"'
   " let text = string(text)
   let f = lh#function#bind(text)
   return f
 endfunction
 
-function! lh#refactor#opt_snippet(option)
+function! lh#refactor#opt_snippet(option) abort
   let snippet = lh#dev#option#get(a:option, &ft, '')
   let f = lh#function#bind("lh#refactor#snippet(lh#dev#option#get(".string(a:option).", &ft, ''))")
   return f
@@ -126,7 +126,7 @@ endfunction
 
 " EM: automagic parameters {{{3
 
-function! s:CheckUsed(variables, lines)
+function! s:CheckUsed(variables, lines) abort
   let used = []
   let is_continuing_comment = 0
   for l in a:lines
@@ -148,7 +148,7 @@ function! s:CheckUsed(variables, lines)
   return used
 endfunction
 
-function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lFunction)
+function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lFunction) abort
   try
     call lh#dev#start_tag_session()
 
@@ -288,7 +288,7 @@ function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lF
   endtry
 endfunction
 
-function! lh#refactor#_do_EM_callback(data)
+function! lh#refactor#_do_EM_callback(data) abort
   " todo: leave the possibility for each formal parameter to be in a
   " placeholder
   "
@@ -364,13 +364,13 @@ if !exists('g:refactor_params') || lh#option#get("refactor_params_reset", 0, 'g'
 endif
 
 " # Fill function {{{2
-function! s:ForceToExist(table, key)
+function! s:ForceToExist(table, key) abort
   if !has_key(a:table, a:key)
     let a:table[a:key] = {}
   endif
 endfunction
 
-function! lh#refactor#fill(refactoring, ft, element, value)
+function! lh#refactor#fill(refactoring, ft, element, value) abort
   call s:ForceToExist(g:refactor_params[a:refactoring], a:ft)
   let familly = g:refactor_params[a:refactoring][a:ft]
   call s:ForceToExist(familly, a:element)
@@ -378,7 +378,7 @@ function! lh#refactor#fill(refactoring, ft, element, value)
 endfunction
 
 " # Inherit function {{{2
-function! lh#refactor#inherit(refactoring, ft_parent, ft_child, deepcopy)
+function! lh#refactor#inherit(refactoring, ft_parent, ft_child, deepcopy) abort
   let refactoring = g:refactor_params[a:refactoring]
   " for [element,def] in items(refactoring)
   let def = refactoring
@@ -660,7 +660,7 @@ endfunction
 " lh#refactor#default_varname()                             {{{3
 " Helper function called by :ExtractVariable
 " @pre: the selection is not expected to be line-wise
-function! lh#refactor#default_varname()
+function! lh#refactor#default_varname() abort
   let expression = lh#visual#selection()
   " try to determine type or any other meaningful thing (may not be possible...)
   try
@@ -719,7 +719,7 @@ endfunction
 " Main function called by :ExtractGetter
 " @pre: the selection must be line-wise
 " @todo: determine external variables, and returned data
-function! lh#refactor#extract_getter()
+function! lh#refactor#extract_getter() abort
   silent! exe "call lh#refactor#".&ft.'#load()'
   let lFunction = s:Option(&ft, 'Eg', '_definition', '')
 
@@ -752,7 +752,7 @@ endfunction
 " Main function called by :ExtractSetter
 " @pre: the selection must be line-wise
 " @todo: determine external variables, and returned data
-function! lh#refactor#extract_setter()
+function! lh#refactor#extract_setter() abort
   silent! exe "call lh#refactor#".&ft.'#load()'
   let lFunction = s:Option(&ft, 'Es', '_definition', '')
 
@@ -852,7 +852,7 @@ endfunction
 " lh#refactor#default_varname()                             {{{2
 " Helper function called by :ExtractVariable
 " @pre: the selection is not expected to be line-wise
-function! lh#refactor#default_varname()
+function! lh#refactor#default_varname() abort
   let expression = lh#visual#selection()
   " try to determine type or any other meaningful thing (may not be possible...)
   try
@@ -867,7 +867,7 @@ endfunction
 
 " General functions                              {{{2         -----------
 " lh#refactor#put_extracted_stuff(bang,what)                {{{3
-function! lh#refactor#put_extracted_stuff(bang, what)
+function! lh#refactor#put_extracted_stuff(bang, what) abort
   " Put the function
   if "!" == a:bang
     silent! put!=a:what
@@ -879,8 +879,8 @@ function! lh#refactor#put_extracted_stuff(bang, what)
 endfunction
 
 
-" s:PutExtractedLast()                                      {{{3
-function! lh#refactor#put_extracted_last(bang)
+" lh#refactor#put_extracted_last()                          {{{3
+function! lh#refactor#put_extracted_last(bang) abort
   call lh#refactor#put_extracted_stuff(a:bang, s:{s:last_refactor})
 endfunction
 

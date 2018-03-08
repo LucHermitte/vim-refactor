@@ -72,7 +72,7 @@ call lh#refactor#fill('EV', 'sh', 'assign',       '=')
 " ## Internal functions {{{1
 " Function: lh#refactor#sh#_load() {{{2
 " Fake function to have the Shell Scripts settings loaded
-function! lh#refactor#sh#_load()
+function! lh#refactor#sh#_load() abort
 endfunction
 
 " }}}1

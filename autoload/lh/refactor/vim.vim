@@ -70,7 +70,7 @@ call lh#refactor#fill('EV', 'vim', 'let',          'let ')
 " ## Internal functions {{{1
 " Function: lh#refactor#vim#_load() {{{2
 " Fake function to have the vim settings loaded
-function! lh#refactor#vim#_load()
+function! lh#refactor#vim#_load() abort
 endfunction
 
 " }}}1

@@ -55,7 +55,7 @@ call lh#refactor#fill('EV', 'php', '_definition',  lh#refactor#snippet('$${_varn
 " ## Internal functions {{{1
 " Function: lh#refactor#php#_load() {{{2
 " Fake function to have the PHP settings loaded
-function! lh#refactor#php#_load()
+function! lh#refactor#php#_load() abort
 endfunction
 
 " }}}1

@@ -163,7 +163,7 @@ endif
 " adding parenthesis after the text given. If there is already a
 " parenthesis in the text, nothing is added.
 " Valable with most languages: C, vimL, ...
-function! RefactorH_func(sig)
+function! RefactorH_func(sig) abort
   if stridx(a:sig, '(') < 0
     return a:sig . '(' . lh#marker#txt('Parameters') . ')'
   else
@@ -174,14 +174,14 @@ endfunction
 " s:IsCConst(varName)                                      {{{3
 " Tells whether the variable name looks like a constant (all upper case / start
 " with k_)
-function! s:IsCConst(variableName)
+function! s:IsCConst(variableName) abort
   let isConst = a:variableName =~ '^k_\|\u[A-Z0-9_]*'
   return isConst
 endfunction
 
 " Callbacks for the various languages            {{{2         -----------
 " C, C++, Java                                             {{{3
-function! Refactor_EM_c(part, ...)
+function! Refactor_EM_c(part, ...) abort
   if     a:part == 'begin'
     return lh#marker#txt('ReturnType').' '.RefactorH_func(a:1) . "\n{"
   elseif a:part == 'end'
@@ -195,7 +195,7 @@ let g:refactor_EM_cpp_is_like  = "c"
 let g:refactor_EM_java_is_like = "c"
 
 " VimL                                                     {{{3
-function! Refactor_EM_vim(part, ...)
+function! Refactor_EM_vim(part, ...) abort
   if     a:part == 'begin'
     return 'function! s:'.RefactorH_func(a:1)
   elseif a:part == 'end'
@@ -207,7 +207,7 @@ endfunction
 
 " Pascal                                                   {{{3
 
-function! s:FuncName(sig)
+function! s:FuncName(sig) abort
   let idx = stridx(a:sig, '(')
   if  idx < 0
     return a:sig
@@ -216,7 +216,7 @@ function! s:FuncName(sig)
   endif
 endfunction
 
-function! Refactor_EM_pascal(part,...)
+function! Refactor_EM_pascal(part,...) abort
   if     a:part == 'begin'
     " first call -> ask a few questions
     let c = confirm('What is extracted', "a &procedure\na &function", 1)
@@ -252,7 +252,7 @@ endfunction
 " Options                                        {{{2         -----------
 "
 " s:Option(ft, name)                                       {{{3
-function! s:Option(ft, refactorKind, name, param)
+function! s:Option(ft, refactorKind, name, param) abort
   let opt = 'Refactor_'.a:refactorKind.'_'.a:ft
   if exists('*'.opt)
     return {opt}(a:name, a:param)
@@ -269,7 +269,7 @@ endfunction
 
 " General functions                              {{{2         -----------
 " s:PutExtractedStuff([bang])                              {{{3
-function! s:PutExtractedStuff(bang, what)
+function! s:PutExtractedStuff(bang, what) abort
   " Put the function
   if "!" == a:bang
     silent! put!=a:what
@@ -282,7 +282,7 @@ endfunction
 
 
 " s:PutExtractedLast()                                     {{{3
-function! s:PutExtractedLast(bang)
+function! s:PutExtractedLast(bang) abort
   call s:PutExtractedStuff(a:bang, s:{s:last_refactor})
 endfunction
 

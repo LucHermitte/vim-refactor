@@ -11,7 +11,7 @@ let s:k_version = 126
 "------------------------------------------------------------------------
 " Description:
 "       «description»
-" 
+"
 "------------------------------------------------------------------------
 " Installation:
 "       Drop this file into {rtp}/autoload/lh/refactor
@@ -54,12 +54,12 @@ endfunction
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
-function! s:CompleteUpToCol(text, col)
+function! s:CompleteUpToCol(text, col) abort
   let text = a:text . repeat(' ', a:col-lh#encoding#strlen(a:text))
   return text
 endfunction
 
-function! s:Gui(self)
+function! s:Gui(self) abort
   let lines = []
   let list = a:self.list
   for p in list
@@ -76,7 +76,7 @@ function! s:Gui(self)
   return join(lines, "\n")
 endfunction
 
-function! lh#refactor#gui_em#open(data)
+function! lh#refactor#gui_em#open(data) abort
   let parameters = { 'list': [] }
   function! a:data.parameters.gui() dict
     return s:Gui(self)
@@ -94,7 +94,7 @@ function! lh#refactor#gui_em#open(data)
         \ })
   let s:data = a:data
 
-  function! VftTest_ChangeCallback(id, value)
+  function! VftTest_ChangeCallback(id, value) abort
     echomsg 'Control ' . a:id . ' got new value ' . a:value
     return
     if a:id == 'colorscheme'
@@ -108,7 +108,7 @@ function! lh#refactor#gui_em#open(data)
 
   call form.setChangeCallback(function('VftTest_ChangeCallback'))
 
-  function! VftTest_ButtonCallback(id)
+  function! VftTest_ButtonCallback(id) abort
     if a:id == 'RENAME'
     elseif a:id == 'OK'
       tabclose

@@ -61,7 +61,7 @@ call lh#refactor#fill('EV_name', 'perl', '$',       '$')
 " ## Internal functions {{{1
 " Function: lh#refactor#perl#_load() {{{2
 " Fake function to have the perl settings loaded
-function! lh#refactor#perl#_load()
+function! lh#refactor#perl#_load() abort
 endfunction
 
 " }}}1
