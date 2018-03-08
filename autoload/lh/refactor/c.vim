@@ -1,5 +1,4 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/refactor/c.vim                       {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
 "               <URL:http://github.com/LucHermitte/vim-refactor>
@@ -27,19 +26,23 @@ function! lh#refactor#c#version()
 endfunction
 
 " # Debug   {{{2
-let s:verbose = 0
+let s:verbose = get(s:, 'verbose', 0)
 function! lh#refactor#c#verbose(...)
   if a:0 > 0 | let s:verbose = a:1 | endif
   return s:verbose
 endfunction
 
-function! s:Verbose(expr)
+function! s:Log(expr, ...)
+  call call('lh#log#this',[a:expr]+a:000)
+endfunction
+
+function! s:Verbose(expr, ...)
   if s:verbose
-    echomsg a:expr
+    call call('s:Log',[a:expr]+a:000)
   endif
 endfunction
 
-function! lh#refactor#c#debug(expr)
+function! lh#refactor#c#debug(expr) abort
   return eval(a:expr)
 endfunction
 

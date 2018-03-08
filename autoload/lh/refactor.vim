@@ -481,19 +481,27 @@ function! lh#refactor#version()
 endfunction
 
 " # Debug                                        {{{2         -----------
-function! lh#refactor#verbose(level)
-  let s:verbose = a:level
+let s:verbose = get(s:, 'verbose', 0)
+function! lh#refactor#verbose(...)
+  if a:0 > 0 | let s:verbose = a:1 | endif
+  return s:verbose
 endfunction
 
-function! s:Verbose(expr)
-  if exists('s:verbose') && s:verbose
-    echomsg a:expr
+function! s:Log(expr, ...)
+  call call('lh#log#this',[a:expr]+a:000)
+endfunction
+
+function! s:Verbose(expr, ...)
+  if s:verbose
+    call call('s:Log',[a:expr]+a:000)
   endif
 endfunction
 
-function! lh#refactor#echo(expr)
-  echo eval(a:expr)
+function! lh#refactor#debug(expr) abort
+  return eval(a:expr)
 endfunction
+
+
 
 " # Options                                      {{{2         -----------
 "
