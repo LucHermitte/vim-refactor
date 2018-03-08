@@ -1,5 +1,5 @@
-*refactor.txt*          Language independent refactoring helpers (v1.2.3)
-*refactor.vim*          For Vim version 7.x.    Last change: 16th Mar 2015
+*refactor.txt*          Language independent refactoring helpers (v2.0.0)
+*refactor.vim*          For Vim version 7.x.    Last change: 08th Mar 2018
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -369,9 +369,9 @@ Issues of where the code must be put (c++), ...
 ==============================================================================
 MAPPINGS                                    *refactor-mappings*           {{{1
 
-    *v_CTRL-X_f* .... |refactor-extract-method|
-    *v_CTRL-X_v* .... |refactor-extract-variable|
-    *v_CTRL-X_t* .... |refactor-extract-type|
+    *x_CTRL-X_f* .... |refactor-extract-method|
+    *x_CTRL-X_v* .... |refactor-extract-variable|
+    *x_CTRL-X_t* .... |refactor-extract-type|
     *n_CTRL-X_g* .... |refactor-extract-getter|
     *n_CTRL-X_s* .... |refactor-extract-setter|
     *CTRL-X_p*   .... put back the last thing extracted after the cursor
@@ -557,7 +557,7 @@ Source code produced with lh-refactor has a license exception, see
 
 
 ==============================================================================
- © Luc Hermitte, 2005-2015 <http://github.com/LucHermitte/vim-refactor>, CC-BY-SA 3.0 {{{1
+ © Luc Hermitte, 2005-2018 <http://github.com/LucHermitte/vim-refactor>, CC-BY-SA 3.0 {{{1
  VIM: let b:VS_language = 'american'
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
  vim600:fdm=marker:

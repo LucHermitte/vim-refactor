@@ -4,7 +4,7 @@
 "               <URL:http://github.com/LucHermitte/vim-refactor>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/vim-refactor/tree/master/License.md>
-" Version:      v1.2.6
+" Version:      v2.0.0
 " Created:      11th Mar 2005
 " Last Update:  08th Mar 2018
 "------------------------------------------------------------------------
@@ -31,6 +31,8 @@
 "       Requires: vim7, lh-vim-lib, lh-dev, lh-tags
 "
 " History:
+"       v2.0.0: 08th Mar 2018
+"               * Change vmap to xmap
 "       v1.2.6: 15th Mar 2017
 "               * Deprecate `CONFIRM()` & co
 "       v1.2.0: 20th Jan 2014
@@ -124,17 +126,17 @@ command! -range -nargs=1 ExtractType
 command! -nargs=0 -bang  PutExtracted
       \ :call lh#refactor#put_extracted_last('')
 
-vnoremap <silent> <c-x>f :call lh#refactor#extract_function(1,lh#ui#input("Name for the function to extract: "))<cr>
+xnoremap <silent> <c-x>f :call lh#refactor#extract_function(1,lh#ui#input("Name for the function to extract: "))<cr>
 
-vnoremap <silent> <Plug>RefactorExtractVariable
+xnoremap <silent> <Plug>RefactorExtractVariable
       \ :call lh#refactor#extract_variable(1,lh#ui#input("Name for the variable to extract: ", lh#refactor#default_varname()))<cr>
 if !hasmapto('<Plug>RefactorExtractVariable', 'v')
-  vmap <unique> <c-x>v <Plug>RefactorExtractVariable
+  xmap <unique> <c-x>v <Plug>RefactorExtractVariable
 endif
-vnoremap <silent> <Plug>RefactorExtractType
+xnoremap <silent> <Plug>RefactorExtractType
       \ :call lh#refactor#extract_type(1,lh#ui#input("Name for the type to extract: "))<cr>
 if !hasmapto('<Plug>RefactorExtractType', 'v')
-  vmap <unique> <c-x>t <Plug>RefactorExtractType
+  xmap <unique> <c-x>t <Plug>RefactorExtractType
 endif
 nnoremap <Plug>RefactorPutLastUp <c-\><c-N>:call lh#refactor#put_extracted_last('!')<cr>
 if !hasmapto('<Plug>RefactorPutLastUp', 'n')
