@@ -158,6 +158,10 @@ endif
 
 " Commands and mappings }}}1
 "------------------------------------------------------------------------
+finish
+" It looks like what follow has been deprecated a long time ago...
+" TODO: remove these functions
+
 " Definitions for the various langages      {{{1        -----------------
 " Helpers                                        {{{2         -----------
 " RefactorH_func(signature)                                {{{3
@@ -171,14 +175,6 @@ function! RefactorH_func(sig) abort
   else
     return a:sig
   endif
-endfunction
-
-" s:IsCConst(varName)                                      {{{3
-" Tells whether the variable name looks like a constant (all upper case / start
-" with k_)
-function! s:IsCConst(variableName) abort
-  let isConst = a:variableName =~ '^k_\|\u[A-Z0-9_]*'
-  return isConst
 endfunction
 
 " Callbacks for the various languages            {{{2         -----------
@@ -248,47 +244,6 @@ function! Refactor_EM_pascal(part,...) abort
 endfunction
 
 " Definitions for the various langages      }}}1        -----------------
-"------------------------------------------------------------------------
-" Functions                                 {{{1        -----------------
-"
-" Options                                        {{{2         -----------
-"
-" s:Option(ft, name)                                       {{{3
-function! s:Option(ft, refactorKind, name, param) abort
-  let opt = 'Refactor_'.a:refactorKind.'_'.a:ft
-  if exists('*'.opt)
-    return {opt}(a:name, a:param)
-  else
-    let as = 'g:refactor_'.a:refactorKind.'_'.a:ft.'_is_like'
-    if exists(as)
-      return s:Option({as}, a:refactorKind, a:name, a:param)
-    else
-      throw "refactor.vim: Please define ``".opt."()''"
-    endif
-  endif
-endfunction
-
-
-" General functions                              {{{2         -----------
-" s:PutExtractedStuff([bang])                              {{{3
-function! s:PutExtractedStuff(bang, what) abort
-  " Put the function
-  if "!" == a:bang
-    silent! put!=a:what
-  else
-    silent! put=a:what
-  endif
-  " Reindent the code inserted
-  silent! '[,']normal! ==
-endfunction
-
-
-" s:PutExtractedLast()                                     {{{3
-function! s:PutExtractedLast(bang) abort
-  call s:PutExtractedStuff(a:bang, s:{s:last_refactor})
-endfunction
-
-" Functions                                 }}}1        -----------------
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================
