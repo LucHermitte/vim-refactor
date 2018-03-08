@@ -32,6 +32,7 @@ let s:k_version = 200
 "       v1.2.0 Can be extended thanks to external files
 "              Bugs fixed regarding snippets for *extracting variables*.
 "       v1.2.6 Deprecate `CONFIRM()` & co
+"       v2.0.0 Migrate dependencies from lh-dev to lh-vim-lib/lh-style
 "
 " TODO:
 "       - support <++> as placeholder marks, and automatically convert them to
@@ -120,8 +121,8 @@ function! lh#refactor#snippet(text) abort
 endfunction
 
 function! lh#refactor#opt_snippet(option) abort
-  let snippet = lh#dev#option#get(a:option, &ft, '')
-  let f = lh#function#bind("lh#refactor#snippet(lh#dev#option#get(".string(a:option).", &ft, ''))")
+  let snippet = lh#ft#option#get(a:option, &ft, '')
+  let f = lh#function#bind("lh#refactor#snippet(lh#ft#option#get(".string(a:option).", &ft, ''))")
   return f
 endfunction
 
@@ -215,7 +216,7 @@ function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lF
 
 
     " 2.3- if a return statement was extracted, forward it
-    let return_re = lh#dev#option#get('return_pattern', &ft, '\<return\>')
+    let return_re = lh#ft#option#get('return_pattern', &ft, '\<return\>')
     let first_return_line = lh#list#match(extracted_lines, return_re)
 
     " 2.4- sort the variables extracted reused after the extracted part
@@ -258,7 +259,7 @@ function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lF
     for p in required_variables
       let p2 = deepcopy(p)
       let p2.dir = 'in'
-      let p2.formal = lh#dev#naming#param(p2.name)
+      let p2.formal = lh#naming#param(p2.name)
       let p2.type   = lh#dev#function#get_(p, 'type')
       let parameters.list += [p2]
     endfor
@@ -266,7 +267,7 @@ function! s:SearchParameters(extract_begin, extract_end, extr_fn_name, lCall, lF
     for p in exported_variables
       let p2 = deepcopy(p)
       let p2.dir = 'out'
-      let p2.formal = lh#dev#naming#param(p2.name)
+      let p2.formal = lh#naming#param(p2.name)
       let p2.type   = lh#dev#function#get_(p, 'type')
       let parameters.list += [p2]
     endfor
@@ -428,8 +429,8 @@ LetIfUndef g:refactor_getter_doc   "/**\ ${_ppt_name}\ getter.\ */\n"
 call lh#refactor#fill('Eg', '_oo_c_', '_definition',  ['doc', 'signature', 'body'])
 call lh#refactor#fill('Eg', '_oo_c_', 'space',        ' ')
 call lh#refactor#fill('Eg', '_oo_c_', 'eol',          ';')
-call lh#refactor#fill('Eg', '_oo_c_', 'open',         lh#function#bind ("lh#dev#option#get('refactor_getter_open', &ft, ' { ')"))
-call lh#refactor#fill('Eg', '_oo_c_', 'close',        lh#function#bind ("lh#dev#option#get('refactor_getter_close', &ft, '}')"))
+call lh#refactor#fill('Eg', '_oo_c_', 'open',         lh#function#bind ("lh#ft#option#get('refactor_getter_open', &ft, ' { ')"))
+call lh#refactor#fill('Eg', '_oo_c_', 'close',        lh#function#bind ("lh#ft#option#get('refactor_getter_close', &ft, '}')"))
 call lh#refactor#fill('Eg', '_oo_c_', 'return',       "return ")
 " call lh#refactor#fill('Eg', '_oo_c_', 'doc_',         lh#refactor#snippet("/** ${_ppt_name} getter. */\n"))
 call lh#refactor#fill('Eg', '_oo_c_', 'doc',          lh#refactor#opt_snippet ('refactor_getter_doc'))
@@ -459,8 +460,8 @@ call lh#refactor#fill('Es', '_oo_c_', 'void',         'void ')
 call lh#refactor#fill('Es', '_oo_c_', 'space',        ' ')
 call lh#refactor#fill('Es', '_oo_c_', 'eol',          ';')
 call lh#refactor#fill('Es', '_oo_c_', 'body',         ['open', '_instruction', 'close'])
-call lh#refactor#fill('Es', '_oo_c_', 'open',         lh#function#bind ("lh#dev#option#get('refactor_setter_open', &ft, ' { ')"))
-call lh#refactor#fill('Es', '_oo_c_', 'close',        lh#function#bind ("lh#dev#option#get('refactor_setter_close', &ft, ' } ')"))
+call lh#refactor#fill('Es', '_oo_c_', 'open',         lh#function#bind ("lh#ft#option#get('refactor_setter_open', &ft, ' { ')"))
+call lh#refactor#fill('Es', '_oo_c_', 'close',        lh#function#bind ("lh#ft#option#get('refactor_setter_close', &ft, ' } ')"))
 
 " # Fix Realloc                                  {{{2         -----------
 " C & familly                                               {{{3         -----------
@@ -501,8 +502,6 @@ endfunction
 function! lh#refactor#debug(expr) abort
   return eval(a:expr)
 endfunction
-
-
 
 " # Options                                      {{{2         -----------
 "
@@ -727,8 +726,8 @@ function! lh#refactor#extract_getter() abort
   try
     let attribute_def = getline('.')
     let attribute = lh#dev#attribute#analyse(attribute_def)
-    let name = lh#dev#naming#variable(attribute.name)
-    let getter_name = lh#dev#naming#getter(name)
+    let name = lh#naming#variable(attribute.name)
+    let getter_name = lh#naming#getter(name)
 
     " Prepare the function body
     let params    = {
@@ -760,9 +759,9 @@ function! lh#refactor#extract_setter() abort
   try
     let attribute_def = getline('.')
     let attribute   = lh#dev#attribute#analyse(attribute_def)
-    let name        = lh#dev#naming#variable(attribute.name)
-    let setter_name = lh#dev#naming#setter(name)
-    let param_name  = lh#dev#naming#param(name)
+    let name        = lh#naming#variable(attribute.name)
+    let setter_name = lh#naming#setter(name)
+    let param_name  = lh#naming#param(name)
     " TODO: This should be computed in hooks
     let instruction = lh#dev#instruction#assign(attribute.name, param_name)
     " TODO: This should also be computed in hooks
@@ -816,17 +815,17 @@ function! lh#refactor#fix_realloc() abort range
     throw "the pointers used in realloc mismatch: <".lhs."> != <".rhs.">. Aborting"
     return
   endif
-  let expected_realloc = lh#dev#option#get('refactor_expected_realloc', &ft, 'realloc')
+  let expected_realloc = lh#ft#option#get('refactor_expected_realloc', &ft, 'realloc')
   if realloc !~  'realloc' && realloc != expected_realloc
     throw "This call doesn't look like a call to realloc. Aborting."
     return
   endif
-  let lhs_prefix    = lh#dev#option#get('refactor_temp_prefix', &ft, 'new_')
-  let free_function = lh#dev#option#get('refactor_free_function', &ft, 'free')
-  let false         = lh#dev#option#get('refactor_false', &ft, 'false')
+  let lhs_prefix    = lh#ft#option#get('refactor_temp_prefix', &ft, 'new_')
+  let free_function = lh#ft#option#get('refactor_free_function', &ft, 'free')
+  let false         = lh#ft#option#get('refactor_false', &ft, 'false')
   let type          = substitute(type, '(\s*\(.\{-}\)\s*\*\s*)', '\1', '')
   " build temporary_variable identifier
-  let lhs = lhs_prefix . lh#dev#naming#variable(matchstr(lhs, '.\{-}\zs\k\+$'))
+  let lhs = lhs_prefix . lh#naming#variable(matchstr(lhs, '.\{-}\zs\k\+$'))
   " count=number of element * sizeof, or size
   let cnt = (size =~ 'sizeof')
         \ ? substitute(size, '\s*\(\*\s*\)\=sizeof([^)]*)\s*\(\*\s*\)\=', '', '')

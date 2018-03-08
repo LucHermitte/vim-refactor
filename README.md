@@ -30,7 +30,7 @@ where the extracted things are to be placed are left to end-user appreciation.
 This has to be done with `<C-X>p` and `<C-X>P`.
 
 ## Installation
-  * Requirements: Vim 7.+, [lh-vim-lib](http://github.com/LucHermitte/lh-vim-lib), [lh-brackets](http://github.com/LucHermitte/lh-brackets), [lh-dev](http://github.com/LucHermitte/lh-dev) (and thus [lh-tags](http://github.com/LucHermitte/lh-tags))
+  * Requirements: Vim 7.+, [lh-vim-lib](http://github.com/LucHermitte/lh-vim-lib), [lh-brackets](http://github.com/LucHermitte/lh-brackets), [lh-dev](http://github.com/LucHermitte/lh-dev) (and thus [lh-tags](http://github.com/LucHermitte/lh-tags)), and [lh-style](http://github.com/LucHermitte/lh-style)
   * With [vim-addon-manager](https://github.com/MarcWeber/vim-addon-manager), install lh-refactor. This is the preferred method because of the various dependencies.
 ```vim
 ActivateAddons lh-refactor
@@ -40,6 +40,7 @@ ActivateAddons lh-refactor
 git clone git@github.com:LucHermitte/lh-vim-lib.git
 git clone git@github.com:LucHermitte/lh-tags.git
 git clone git@github.com:LucHermitte/lh-dev.git
+git clone git@github.com:LucHermitte/lh-style.git
 git clone git@github.com:LucHermitte/lh-brackets.git
 git clone git@github.com:LucHermitte/vim-refactor.git
 ```
@@ -48,6 +49,7 @@ git clone git@github.com:LucHermitte/vim-refactor.git
 Bundle 'LucHermitte/lh-vim-lib'
 Bundle 'LucHermitte/lh-tags'
 Bundle 'LucHermitte/lh-dev'
+Bundle 'LucHermitte/lh-style'
 Bundle 'LucHermitte/lh-brackets'
 Bundle 'LucHermitte/vim-refactor'
 ```
