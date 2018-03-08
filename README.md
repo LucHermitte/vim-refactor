@@ -1,4 +1,4 @@
-# vim-refactor v2.0.0 [![Last release](https://img.shields.io/github/tag/LucHermitte/vim-refactor.svg)](https://github.com/LucHermitte/vim-refactor/releases) [![Build Status](https://secure.travis-ci.org/LucHermitte/vim-refactor.png?branch=master)](http://travis-ci.org/LucHermitte/vim-refactor) [![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
+# vim-refactor v2.0.0 [![Last release](https://img.shields.io/github/tag/LucHermitte/vim-refactor.svg)](https://github.com/LucHermitte/vim-refactor/releases) [![Project Stats](https://www.openhub.net/p/21020/widgets/project_thin_badge.gif)](https://www.openhub.net/p/21020)
 ## Features
 
 lh-refactor is a generic refactoring plugin.
