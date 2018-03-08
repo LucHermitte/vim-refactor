@@ -4,8 +4,8 @@
 "               <URL:http://github.com/LucHermitte/vim-refactor>
 " License:      GPLv3 with exceptions
 "               <URL:http://github.com/LucHermitte/vim-refactor/tree/master/License.md>
-" Version:      1.2.6
-let s:k_version = 126
+" Version:      2.0.0
+let s:k_version = 200
 " Created:      20th Jan 2014
 " Last Update:  08th Mar 2018
 "------------------------------------------------------------------------

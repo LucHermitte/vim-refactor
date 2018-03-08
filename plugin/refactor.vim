@@ -81,7 +81,7 @@
 if exists("g:loaded_refactor") && !exists('g:force_reload_refactor')
   finish
 endif
-let g:loaded_refactor = 120
+let g:loaded_refactor = 200
 let s:cpo_save=&cpo
 set cpo&vim
 " Avoid global reinclusion }}}1

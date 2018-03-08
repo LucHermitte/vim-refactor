@@ -1,13 +1,13 @@
 "=============================================================================
 " File:		mkVba/mk-lh-refactor.vim                            {{{1
 " Author:	Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://github.com/LucHermitte/vim-refactor>
+"               <URL:http://github.com/LucHermitte/vim-refactor>
 " License:      GPLv3 with exceptions
-"               <URL:http://github.com/LucHermitte/vim-refactor/License.md>
-" Version:	1.2.6
-let s:version = '1.2.6'
+"               <URL:http://github.com/LucHermitte/vim-refactor/tree/master/License.md>
+" Version:	2.0.0
+let s:version = '2.0.0'
 " Created:	06th Nov 2007
-" Last Update:	15th Mar 2017
+" Last Update:	08th Mar 2018
 "------------------------------------------------------------------------
 " Description:
 "       vimball archive builder for lh-refactor
