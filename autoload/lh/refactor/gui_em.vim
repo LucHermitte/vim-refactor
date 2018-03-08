@@ -1,10 +1,13 @@
 "=============================================================================
 " File:         autoload/lh/refactor/gui_em.vim                   {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
-" Version:      0.2.0
+"               <URL:http://github.com/LucHermitte/vim-refactor>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/vim-refactor/tree/master/License.md>
+" Version:      1.2.6
+let s:k_version = 126
 " Created:      01st Jun 2010
-" Last Update:  22nd Dec 2015
+" Last Update:  08th Mar 2018
 "------------------------------------------------------------------------
 " Description:
 "       «description»
@@ -24,7 +27,6 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 020
 function! lh#refactor#gui_em#version()
   return s:k_version
 endfunction
@@ -45,7 +47,6 @@ endfunction
 function! lh#refactor#gui_em#debug(expr)
   return eval(a:expr)
 endfunction
-
 
 "------------------------------------------------------------------------
 " ## Exported functions {{{1
@@ -85,8 +86,8 @@ function! lh#refactor#gui_em#open(data)
   let returns = [ 'void' ]
   call form.setItems('return', returns)
   call form.setValues({
-	\ 'return': returns[0]
-	\ })
+        \ 'return': returns[0]
+        \ })
   let s:data = a:data
 
   function! VftTest_ChangeCallback(id, value)
@@ -126,6 +127,7 @@ endfunction
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
 
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================

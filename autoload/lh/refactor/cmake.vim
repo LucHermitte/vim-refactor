@@ -1,15 +1,16 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/refactor/cmake.vim                    {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
-" Version:      1.2.1
+"               <URL:http://github.com/LucHermitte/vim-refactor>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/vim-refactor/tree/master/License.md>
+" Version:      1.2.6
+let s:k_version = 126
 " Created:      06th Mar 2014
-" Last Update:  $Date$
+" Last Update:  08th Mar 2018
 "------------------------------------------------------------------------
 " Description:
 "       CMake settings for lh-refactor
-" 
 "------------------------------------------------------------------------
 " }}}1
 "=============================================================================
@@ -19,7 +20,6 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 121
 function! lh#refactor#cmake#version()
   return s:k_version
 endfunction
@@ -56,7 +56,7 @@ call lh#refactor#fill('EV', 'cmake', '_definition',  lh#refactor#snippet('SET(${
 function! lh#refactor#cmake#_load()
 endfunction
 
-
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================

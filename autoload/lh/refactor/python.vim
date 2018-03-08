@@ -1,15 +1,16 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/refactor/python.vim                   {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
-" Version:      1.2.2
+"               <URL:http://github.com/LucHermitte/vim-refactor>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/vim-refactor/tree/master/License.md>
+" Version:      1.2.6
+let s:k_version = 126
 " Created:      19th Dec 2014
-" Last Update:  $Date$
+" Last Update:  08th Mar 2018
 "------------------------------------------------------------------------
 " Description:
 "       Python settings for lh-refactor
-" 
 "------------------------------------------------------------------------
 " }}}1
 "=============================================================================
@@ -19,7 +20,6 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 122
 function! lh#refactor#python#version()
   return s:k_version
 endfunction
@@ -69,6 +69,7 @@ call lh#refactor#fill('EV', 'python', 'assign',       '=')
 function! lh#refactor#python#_load()
 endfunction
 
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================

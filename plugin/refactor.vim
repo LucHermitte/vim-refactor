@@ -1,10 +1,12 @@
 "=============================================================================
 " File:         refactor.vim                                           {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"               <URL:http://code.google.com/p/lh-vim/>
+"               <URL:http://github.com/LucHermitte/vim-refactor>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/vim-refactor/tree/master/License.md>
 " Version:      v1.2.6
 " Created:      11th Mar 2005
-" Last Update:  15th Mar 2017
+" Last Update:  08th Mar 2018
 "------------------------------------------------------------------------
 " Description:  Some refactoring oriented mappings and commands
 "
@@ -283,8 +285,6 @@ endfunction
 function! s:PutExtractedLast(bang)
   call s:PutExtractedStuff(a:bang, s:{s:last_refactor})
 endfunction
-
-
 
 " Functions                                 }}}1        -----------------
 "------------------------------------------------------------------------

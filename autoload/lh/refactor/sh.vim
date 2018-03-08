@@ -1,15 +1,16 @@
 "=============================================================================
-" $Id$
 " File:         autoload/lh/refactor/sh.vim                       {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"		<URL:http://code.google.com/p/lh-vim/>
-" Version:      1.2.0
+"               <URL:http://github.com/LucHermitte/vim-refactor>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/vim-refactor/tree/master/License.md>
+" Version:      1.2.6
+let s:k_version = 126
 " Created:      20th Jan 2014
-" Last Update:  $Date$
+" Last Update:  08th Mar 2018
 "------------------------------------------------------------------------
 " Description:
 "       Shell scripts (sh, bash, ...) settings for lh-refactor
-" 
 "------------------------------------------------------------------------
 " }}}1
 "=============================================================================
@@ -19,7 +20,6 @@ set cpo&vim
 "------------------------------------------------------------------------
 " ## Misc Functions     {{{1
 " # Version {{{2
-let s:k_version = 120
 function! lh#refactor#sh#version()
   return s:k_version
 endfunction
@@ -71,6 +71,7 @@ call lh#refactor#fill('EV', 'sh', 'assign',       '=')
 function! lh#refactor#sh#_load()
 endfunction
 
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================

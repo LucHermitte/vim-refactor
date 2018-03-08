@@ -1,10 +1,12 @@
 "=============================================================================
 " File:         autoload/lh/refactor.vim                                 {{{1
 " Author:       Luc Hermitte <EMAIL:hermitte {at} free {dot} fr>
-"               <URL:http://code.google.com/p/lh-vim/>
+"               <URL:http://github.com/LucHermitte/vim-refactor>
+" License:      GPLv3 with exceptions
+"               <URL:http://github.com/LucHermitte/vim-refactor/tree/master/License.md>
 " Version:      1.2.6
 " Created:      31st Oct 2008
-" Last Update:  15th Mar 2017
+" Last Update:  08th Mar 2018
 "------------------------------------------------------------------------
 " Description:
 "       Language independent refactoring suite
@@ -474,7 +476,6 @@ call lh#refactor#fill('Es', '_oo_c_', 'close',        lh#function#bind ("lh#dev#
 " ## Misc Functions     {{{1
 
 " # Version                                      {{{2         -----------
-let s:k_version = 120
 function! lh#refactor#version()
   return s:k_version
 endfunction
@@ -646,8 +647,6 @@ function! lh#refactor#extract_variable(mayabort, variableName) range abort
     " Restaure the register @a
     let @a = a_save
   endtry
-
-
 endfunction
 
 " lh#refactor#default_varname()                             {{{3
@@ -877,6 +876,7 @@ function! lh#refactor#put_extracted_last(bang)
   call lh#refactor#put_extracted_stuff(a:bang, s:{s:last_refactor})
 endfunction
 
+" }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save
 "=============================================================================
