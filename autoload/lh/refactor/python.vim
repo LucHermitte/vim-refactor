@@ -7,7 +7,7 @@
 " Version:      2.0.0
 let s:k_version = 200
 " Created:      19th Dec 2014
-" Last Update:  08th Mar 2018
+" Last Update:  05th Mar 2019
 "------------------------------------------------------------------------
 " Description:
 "       Python settings for lh-refactor
@@ -61,7 +61,7 @@ call lh#refactor#fill('EM', 'python', 'placeholder', lh#refactor#placeholder('')
 " # Refactoring expression in a new variable     {{{2         -----------
 call lh#refactor#fill('EV', 'python', '_use',         ['_varname'])
 call lh#refactor#fill('EV', 'python', '_definition',  ['_varname', 'assign', '_value'])
-call lh#refactor#fill('EV', 'python', 'assign',       '=')
+call lh#refactor#fill('EV', 'python', 'assign',       ' = ')
 
 " call lh#refactor#fill('EV_name', 'sh',            '_naming_policy', ['$'])
 " call lh#refactor#fill('EV_name', 'sh', '$',       '$')
