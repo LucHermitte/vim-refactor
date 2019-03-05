@@ -7,7 +7,7 @@
 " Version:      2.0.0
 let s:k_version = 200
 " Created:      31st Oct 2008
-" Last Update:  08th Mar 2018
+" Last Update:  05th Mar 2019
 "------------------------------------------------------------------------
 " Description:
 "       Language independent refactoring suite
@@ -33,6 +33,8 @@ let s:k_version = 200
 "              Bugs fixed regarding snippets for *extracting variables*.
 "       v1.2.6 Deprecate `CONFIRM()` & co
 "       v2.0.0 Migrate dependencies from lh-dev to lh-vim-lib/lh-style
+"              Use current indent by default when indenting (typically extract
+"              variable in Python)
 "
 " TODO:
 "       - support <++> as placeholder marks, and automatically convert them to
@@ -868,11 +870,14 @@ endfunction
 " General functions                              {{{2         -----------
 " lh#refactor#put_extracted_stuff(bang,what)                {{{3
 function! lh#refactor#put_extracted_stuff(bang, what) abort
+  " With some languages (e.g., the indenting needs to be forced)
+  let indent = indent('.')
+  let what = repeat(' ', indent) . a:what
   " Put the function
   if "!" == a:bang
-    silent! put!=a:what
+    silent! put!=what
   else
-    silent! put=a:what
+    silent! put=what
   endif
   " Reindent the code inserted
   silent! '[,']normal! ==
