@@ -7,7 +7,7 @@
 " Version:      2.0.0
 let s:k_version = 200
 " Created:      19th Dec 2014
-" Last Update:  05th Mar 2019
+" Last Update:  05th Jan 2021
 "------------------------------------------------------------------------
 " Description:
 "       Python settings for lh-refactor
@@ -49,7 +49,7 @@ endfunction
 " ## Python Refactorings {{{1
 " # Extract Method                               {{{2         -----------
 call lh#refactor#fill('EM', 'python', '_call',       ['fcall'])
-call lh#refactor#fill('EM', 'python', 'fcall',       lh#function#bind('v:1_._fname ." ".Marker_Txt("parameters")') )
+call lh#refactor#fill('EM', 'python', 'fcall',       lh#function#bind('v:1_._fname ." ".lh#marker#txt("parameters")') )
 call lh#refactor#fill('EM', 'python', '_function',   ['begin', '_body', 'end'])
 call lh#refactor#fill('EM', 'python', 'begin',       [ 'def', 'fsig', 'open' ] )
 call lh#refactor#fill('EM', 'python', 'fsig',        lh#function#bind('v:1_._fname . "()"'))

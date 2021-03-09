@@ -7,7 +7,7 @@
 " Version:      2.0.0
 let s:k_version = 200
 " Created:      20th Jan 2014
-" Last Update:  08th Mar 2018
+" Last Update:  05th Jan 2021
 "------------------------------------------------------------------------
 " Description:
 "       Shell scripts (sh, bash, ...) settings for lh-refactor
@@ -49,7 +49,7 @@ endfunction
 " ## Shell scripts (sh, bash, ...) Refactorings {{{1
 " # Extract Method                               {{{2         -----------
 call lh#refactor#fill('EM', 'sh', '_call',       ['fcall'])
-call lh#refactor#fill('EM', 'sh', 'fcall',       lh#function#bind('v:1_._fname ." ".Marker_Txt("parameters")') )
+call lh#refactor#fill('EM', 'sh', 'fcall',       lh#function#bind('v:1_._fname ." ".lh#marker#txt("parameters")') )
 call lh#refactor#fill('EM', 'sh', '_function',   ['begin', '_body', 'end'])
 call lh#refactor#fill('EM', 'sh', 'begin',       [ 'fsig', 'open' ] )
 call lh#refactor#fill('EM', 'sh', 'fsig',        lh#function#bind('v:1_._fname . "()"'))
