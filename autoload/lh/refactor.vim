@@ -7,7 +7,7 @@
 " Version:      2.0.0
 let s:k_version = 200
 " Created:      31st Oct 2008
-" Last Update:  05th Mar 2019
+" Last Update:  09th Mar 2021
 "------------------------------------------------------------------------
 " Description:
 "       Language independent refactoring suite
@@ -56,13 +56,13 @@ set cpo&vim
 " # Helper functions                             {{{2         -----------
 " s:ConstKey(varName)                                       {{{3
 function! lh#refactor#const_key(varName) abort
-  let res = s:IsCConst(a:varName) ? (exists('c_no_c99') ? '#define ' : 'const ') : ''
+  let res = lh#refactor#is_const_name(a:varName) ? (exists('g:c_no_c99') ? '#define ' : 'const ') : ''
   return res
 endfunction
-" s:IsCConst(varName)                                       {{{3
+" lh#refactor#is_const_name(variableName)                   {{{3
 " Tells whether the variable name looks like a constant (all upper case / start
 " with k_)
-function! s:IsCConst(variableName) abort
+function! lh#refactor#is_const_name(variableName) abort
   let isConst = a:variableName =~ '^k_\|\u[A-Z0-9_]*'
   return isConst
 endfunction
@@ -114,7 +114,6 @@ function! lh#refactor#placeholder(text, ...) abort
 endfunction
 
 " lh#refactor#snippet(text)                                 {{{3
-" todo: option to return nothing when |b:usemarks| is false
 function! lh#refactor#snippet(text) abort
   let text = '"' . substitute(a:text, '${\(\k\{-}\)}', '".v:1_.\1."', 'g') . '"'
   " let text = string(text)
@@ -122,9 +121,18 @@ function! lh#refactor#snippet(text) abort
   return f
 endfunction
 
+" lh#refactor#opt_snippet(option)                           {{{3
 function! lh#refactor#opt_snippet(option) abort
   let snippet = lh#ft#option#get(a:option, &ft, '')
   let f = lh#function#bind("lh#refactor#snippet(lh#ft#option#get(".string(a:option).", &ft, ''))")
+  return f
+endfunction
+
+" lh#refactor#snippet_call(func, ...)                        {{{3
+function! lh#refactor#snippet_call(func, ...) abort
+  let args = map(copy(a:000), 'substitute(v:val, "${\\(\\k\\{-}\\)}", "v:1_.\\1", "g")')
+  let text = a:func."(".join(args, ", ").")"
+  let f = lh#function#bind(text)
   return f
 endfunction
 
@@ -686,7 +694,6 @@ function! lh#refactor#extract_type(mayabort, typeName) range abort
   endif
   silent! exe "call lh#refactor#".&ft.'#load()'
   let lUse        = s:Option(&ft, 'ET', '_use', '')
-  let lDefinition = s:Option(&ft, 'ET', '_definition', '')
 
   let params      = {'_typename': a:typeName}
   let sUse        = s:Concat(&ft, 'EV', lUse       , params)
@@ -697,7 +704,8 @@ function! lh#refactor#extract_type(mayabort, typeName) range abort
     " Extract the selected expression into register @a
     exe "normal! gv\"ac".sUse
     let params['_typeexpression'] = @a
-    let sDefinition = s:Concat(&ft, 'ET', lDefinition, params)
+    let lDefinition = s:Option(&ft, 'ET', '_definition', params)
+    let sDefinition = type(lDefinition) != type([]) ? lDefinition : s:Concat(&ft, 'ET', lDefinition, params)
     let s:type = sDefinition
     let s:last_refactor='type'
 

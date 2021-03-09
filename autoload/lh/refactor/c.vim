@@ -7,7 +7,7 @@
 " Version:      2.0.0
 let s:k_version = 200
 " Created:      20th Jan 2014
-" Last Update:  08th Mar 2018
+" Last Update:  09th Mar 2021
 "------------------------------------------------------------------------
 " Description:
 "       C & familly settings for lh-refactor
@@ -60,15 +60,11 @@ call lh#refactor#fill('EM', 'c', 'begin',       ['rettype', 'fsig', 'open', 'NL'
 call lh#refactor#fill('EM', 'c', 'close',       "\n}")
 call lh#refactor#fill('EM', 'c', 'end',         ['close', 'placeholder', 'NL'])
 " call has to accept an optional parameter: the function parameters...
-call lh#refactor#fill('EM', 'c', 'call',        lh#function#bind("lh#refactor#hfunc(v:1_, '_real_params').';'.Marker_Txt()"))
+call lh#refactor#fill('EM', 'c', 'call',        lh#function#bind("lh#refactor#hfunc(v:1_, '_real_params').';'.lh#marker#txt()"))
 
 " # Refactoring expression in a new variable     {{{2         -----------
 call lh#refactor#fill('EV', 'c', '_use',         ['_varname'])
-call lh#refactor#fill('EV', 'c', '_definition',  ['mutable', 'type', '_varname', 'assign', '_value', 'eol'])
-call lh#refactor#fill('EV', 'c', 'assign',       ' = ')
-call lh#refactor#fill('EV', 'c', 'eol',          ';')
-call lh#refactor#fill('EV', 'c', 'type',         lh#function#bind('lh#dev#types#deduce(v:1_._value) . " "'))
-call lh#refactor#fill('EV', 'c', 'mutable',      lh#function#bind(function('lh#refactor#const_key'), 'v:1_._varname'))
+call lh#refactor#fill('EV', 'c', '_definition',  lh#refactor#snippet_call('lh#refactor#c#_variable_snippet', '${_varname}', '${_value}'))
 
 " # Extract Type                                 {{{2         -----------
 call lh#refactor#fill('ET', 'c', '_use',         ['_typename'])
@@ -79,6 +75,19 @@ call lh#refactor#fill('ET', 'c', 'eol',          ';')
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
+
+" Function: lh#refactor#c#_variable_snippet() {{{3
+function! lh#refactor#c#_variable_snippet(varname, expression) abort
+  let type = lh#dev#types#deduce(a:expression)
+  if lh#refactor#is_const_name(a:varname)
+    return lh#dev#cpp#types#define_constexpression(type, a:varname, a:expression)
+  elseif lh#ft#option#get('prefer_const_variables', &ft, 1)
+    let type = lh#dev#cpp#types#add_const(type)
+  endif
+  " TODO: support uniform syntax initialization for those that prefer it
+  return printf('%s %s = %s;', type, a:varname, a:expression)
+endfunction
+
 " Function: lh#refactor#c#_load() {{{2
 " Fake function to have the c settings loaded
 function! lh#refactor#c#_load() abort

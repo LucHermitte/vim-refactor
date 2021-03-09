@@ -7,7 +7,7 @@
 " Version:      2.0.0
 let s:k_version = 200
 " Created:      20th Jan 2014
-" Last Update:  08th Mar 2018
+" Last Update:  09th Mar 2021
 "------------------------------------------------------------------------
 " Description:
 "       C++ settings for lh-refactor
@@ -63,6 +63,8 @@ call lh#refactor#inherit('EV', 'c', 'cpp', 0)
 
 " # Extract Type                                 {{{2         -----------
 call lh#refactor#inherit('ET', 'c', 'cpp', 1)
+call lh#refactor#fill('ET', 'cpp', '_use',         ['_typename'])
+call lh#refactor#fill('ET', 'cpp', '_definition',  lh#refactor#snippet_call('lh#dev#cpp#types#define', '${_typename}', '${_typeexpression}'))
 
 " # Extract Getter                               {{{2         -----------
 " Deep copy of the generic definition, in order to customize the result for C++

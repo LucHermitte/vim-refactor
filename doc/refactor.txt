@@ -1,5 +1,5 @@
 *refactor.txt*          Language independent refactoring helpers (v2.0.0)
-*refactor.vim*          For Vim version 7.x.    Last change: 08th Mar 2018
+*refactor.vim*          For Vim version 7.x.    Last change: 09th Mar 2021
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -88,20 +88,20 @@ current line.
 (EM) Languages support~
 
 A few languages are already supported by the refactoring Extract-Method
-implemented in refactor.vim: C, C++, Java, Pascal, sh, VimL
+implemented in refactor.vim: C, C++, Java, Pascal, sh, Vimscript language.
 
                                                         *refactor-EM_new-ft*
 In order to define hooks for this refactoring, the function
 |lh#refactor#fill()| shall be used with the following arguments:
-  - "EM" (as in "Extract Method")
+  - `"EM"` (as in "Extract Method")
   - {ft}
   - {hook} which tells which hook we want to define
     This refactoring expect at least the two hooks to be defined:
-    - "_call" that describes how the function call is built
-    - "_function" that describes how the extracted function definition is
+    - `"_call"` that describes how the function call is built
+    - `"_function"` that describes how the extracted function definition is
       built.
-    Both takes the parameter "_fname" in case a function name is given to
-    |:ExtractFunction|, and "_function" also takes the parameter "_body".
+    Both takes the parameter `"_fname"` in case a function name is given to
+    |:ExtractFunction|, and `"_function"` also takes the parameter `"_body"`.
 
   Simple example: sh >
     call lh#refactor#fill('EM', 'sh', '_call', ['fcall'])
@@ -157,7 +157,7 @@ Complex examples~
 
 As we can see, this specialization asks the user whether he wants to extract a
 function or a procedure. The variable is stored (in "ask_kind") for later use
-in the hooks "call", "return", and "begin")
+in the hooks `"call"`, `"return"`, and `"begin"`)
 
 - check class name/scope in C++
 
@@ -211,15 +211,22 @@ The behavior of these commands can be tuned for various languages. See
 
 In order to define hooks for this refactoring, the function
 |lh#refactor#fill()| shall be used with the following arguments:
-  - "ET" (as in "Extract Type")
+  - `"ET"` (as in "Extract Type")
   - {ft}
   - {hook} which tells which hook we want to define
     This refactoring expect at least the two hooks to be defined:
-    - "_use" that describes what replaces the extracted type
-    - "_definition" that describes how the extracted type definition is built.
-    Both takes the parameter "_typename" in case a type name is given to
-    |:ExtractType|, and "_definition" also takes the parameter
-    "_typeexpression".
+    - `"_use"` that describes what replaces the extracted type
+    - `"_definition"` that describes how the extracted type definition is built.
+    Both takes the parameter `"_typename"` in case a type name is given to
+    |:ExtractType|, and `"_definition"` also takes the parameter
+    `"_typeexpression"`.
+
+                                                  *refactor-ET-cpp*
+In the particular case of C++ language~
+|lh-dev|'s |lh#dev#cpp#types#define()| function is used for C++ case.
+If C++11 (&+) is detected, and if option *(bpg):cpp_define_types_with_using*
+is true (default case), then new type will be defined with `using`.
+Otherwise C `typedef` keyword will be used.
 
 
 ==============================================================================
@@ -264,6 +271,28 @@ the commanded is "banged" (!), the declaration will be inserted before the
 current line.
 
 
+                                                  *refactor-EV_c*
+                                                  *refactor-EV-cpp*
+In the particular case of C and C++ languages~
+1. If the chosen variable name starts with `k_` or is in `UPPER_SNAKE_CASE`,
+the heuristic is to consider the extracted expression to be a constant
+expression. It'll be be defined with `#define` in C89, with `constexpr` in
+C++11 (and later), or with `const/*expr*/` otherwise.
+
+2. Otherwise, we consider we define a new variable. If
+*(bpg):[ft_]prefer_const_variables* is true (which is my default prefered
+style, see also various guidelines like C++CoreGuideline), the variable will
+be declared `const`.
+By default, _east const_ style will be used. If you prefer the more _popular_
+_const west_ style, set *(bpg):place_const_after_type* to 0/|v:false|.
+
+3. Also, the plugin tries to deduce the type from the expression with
+|lh-dev|'s |lh#dev#types#deduce()| function.
+- In the case of C++11 (&+) `auto`  will be used by default.
+- A |marker| (`«type»`) will be returned otherwise. Eventually, |vim-clang|
+  could be used to find the exact type.
+
+
 ------------------------------------------------------------
 (EV) Languages support~
 
@@ -272,15 +301,15 @@ The behavior of these commands can be tuned for various languages. See
 
 In order to define hooks for this refactoring, the function
 |lh#refactor#fill()| shall be used with the following arguments:
-  - "EV" (as in "Extract Variable")
+  - `"EV"` (as in "Extract Variable")
   - {ft}
   - {hook} which tells which hook we want to define
     This refactoring expect at least the two hooks to be defined:
-    - "_use" that describes what replaces the extracted type
-    - "_definition" that describes how the extracted type definition is built.
-    Both takes the parameter "_varname" in case a type name is given to
-    |:ExtractType|, and "_definition" also takes the parameter
-    "_value".
+    - `"_use"` that describes what replaces the extracted type
+    - `"_definition"` that describes how the extracted type definition is built.
+    Both takes the parameter `"_varname"` in case a type name is given to
+    |:ExtractType|, and `"_definition"` also takes the parameter
+    `"_value"`.
 
 
 ==============================================================================
@@ -317,21 +346,21 @@ The behavior of these commands can be tuned for various languages. See
 
 In order to define hooks for this refactoring, the function
 |lh#refactor#fill()| shall be used with the following arguments:
-  - "Eg" (as in "Extract Getter"), or "Es" (as in "Extract Setter")
+  - `"Eg"` (as in "Extract Getter"), or "Es" (as in "Extract Setter")
   - {ft}
   - {hook} which tells which hook we want to define
     This refactoring expect at least the following hook to be defined:
-    "_definition" that describes how the extracted accessor/mutator
+    `"_definition"` that describes how the extracted accessor/mutator
       definition is built.
     It takes the following parameters (|refactoring-properties|): (this will
     change!)
-    - "_ppt_name"
-    - "_name"
-    - "_type"
-    - "_static"
-    - "_fname"
-    - "_args"
-    - "_instruction"
+    - `"_ppt_name"`
+    - `"_name"`
+    - `"_type"`
+    - `"_static"`
+    - `"_fname"`
+    - `"_args"`
+    - `"_instruction"`
 
 The default generation procedure uses the following parametrable functions:
 - |lh#dev#naming#variable()| to deduce the property name
@@ -468,19 +497,19 @@ Helper functors~
 
                                                     *lh#refactor#hfunc()*
 lh#refactor#hfunc({dict},{params})~
-It returns ${{dict}._fname} value followed by "(«parameters»)" if its argument
-contains no open-bracket "(".
+It returns `${{dict}._fname}` value followed by "`(«parameters»)`" if its argument
+contains no open-bracket "`(`".
 
                                                     *lh#refactor#hfunc_full()*
 lh#refactor#hfunc_full({dict},{params})~
-It returns ${{dict}._fname_full} value followed by "(«parameters»)" if its
-argument contains no open-bracket "(".
+It returns `${{dict}._fname_full}` value followed by "`(«parameters»)`" if its
+argument contains no open-bracket "`(`".
 
                                                     *lh#refactor#placeholder()*
 lh#refactor#placeholder({text} [, {extra}])~
 Returns a |lhvl#function| that returns a dynamically computed
-placeholder/|marker| thanks to |Marker_Txt()|. As it is dynamically computed,
-the placeholder characters may be changed at anytime.
+placeholder/|marker| thanks to |lh#marker#txt()|. As it is dynamically
+computed, the placeholder characters may be changed at anytime.
 
                                                     *lh#refactor#let()*
 lh#refactor#let({varname}, {value})~
@@ -491,18 +520,37 @@ that is made available to all hooks of the refactoring.
                                                     *lh#refactor#snippet()*
 lh#refactor#snippet({text})~
 Returns a |lhvl#function| that returns the text passed in parameters, but with
-variables within ${} extracted from the current |refactoring-properties|.
+variables within `${}` extracted from the current |refactoring-properties|.
 Snippets do not support inline computations. Have your computations done
 elsewhere (for instance: in hooks evaluation).
 
+e.g. >
+  call lh#refactor#fill('EV', 'cmake', '_use', lh#refactor#snippet('${${_varname}}'))
+<
 
                                                     *lh#refactor#opt_snippet()*
 lh#refactor#opt_snippet({option})~
 This function is a wrapper around |lh#refactor#snippet()|. It fetches the
 language-specializable option received as a parameter (see
-|lh#dev#option#get()|), and then uses its value as parameter for
+|lh#ft#option#get()|), and then uses its value as parameter for
 |lh#refactor#snippet()|.
 
+
+                                                    *lh#refactor#snippet_call()*
+lh#refactor#snippet_call({funcname} [, options...])~
+This function is a wrapper around |lh#refactor#snippet()|. It calls the
+function passed as argument at the last moment with the parameters specified.
+This permits to adapt dynamically the generated snippets to various
+information like C++ flavour, whether we prefer east-const or const-west, and
+so on.
+
+Like with |lh#refactor#snippet()|, parameters in the form of `${}` will be
+replaced with the current |refactoring-properties|.
+
+e.g. >
+  call lh#refactor#fill('EV', 'c',   '_definition', lh#refactor#snippet_call('lh#refactor#c#_variable_snippet', '${_varname}', '${_value}'))
+  call lh#refactor#fill('ET', 'cpp', '_definition', lh#refactor#snippet_call('lh#dev#cpp#types#define', '${_typename}', '${_typeexpression}'))
+<
 
 ==============================================================================
 LINKS OF INTEREST                           *refactor-links*              {{{1
@@ -528,19 +576,21 @@ NOTES                                       *refactor-notes*              {{{1
 
 Requirements~
 |lh-vim-lib| (for |lhvl#function|)
-|bracketing.base.vim| (for |Marker_Txt()|),
+|lh-brackets| (for |lh#marker#txt()|),
 |lh-dev| (for various options)
+and |lh-cpp| for more advanced heuristic for C++ -- without |lh-cpp|,
+simplified heuristics will be used to detect the exact C++ flavour.
 
 Design notes~
 function => dynamic. i.e. the Marker-characters can be changed before
-:ExtractFunction. We can even define hooks that will ask for things (like
+|:ExtractFunction|. We can even define hooks that will ask for things (like
 function names, visibility, ...) to the end-user (with |inputdialog()| for
 instance).
 
 
 Future developments~
 lh-refactor may change the way the things inserted are built in a later
-version.  Indeed, |mu-template| already offer many features that lh-refactor
+version. Indeed, |mu-template| already offer many features that lh-refactor
 may take advantage of.
 
 Regarding |refactor-extract-method|, I've started to play with |tags| in order
@@ -557,7 +607,7 @@ Source code produced with lh-refactor has a license exception, see
 
 
 ==============================================================================
- © Luc Hermitte, 2005-2018 <http://github.com/LucHermitte/vim-refactor>, CC-BY-SA 3.0 {{{1
+ © Luc Hermitte, 2005-2021 <http://github.com/LucHermitte/vim-refactor>, CC-BY-SA 3.0 {{{1
  VIM: let b:VS_language = 'american'
  vim:ts=8:sw=4:tw=80:fo=tcq2:ft=help:
  vim600:fdm=marker:
