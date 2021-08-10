@@ -32,27 +32,40 @@ This has to be done with `<C-X>p` and `<C-X>P`.
 ## Installation
   * Requirements: Vim 7.+, [lh-vim-lib](http://github.com/LucHermitte/lh-vim-lib), [lh-brackets](http://github.com/LucHermitte/lh-brackets), [lh-dev](http://github.com/LucHermitte/lh-dev) (and thus [lh-tags](http://github.com/LucHermitte/lh-tags)), and [lh-style](http://github.com/LucHermitte/lh-style)
   * With [vim-addon-manager](https://github.com/MarcWeber/vim-addon-manager), install lh-refactor. This is the preferred method because of the various dependencies.
-```vim
-ActivateAddons lh-refactor
-```
+
+    ```vim
+    ActivateAddons lh-refactor
+    ```
+
   * or you can clone the git repositories (expecting I haven't forgotten anything):
-```
-git clone git@github.com:LucHermitte/lh-vim-lib.git
-git clone git@github.com:LucHermitte/lh-tags.git
-git clone git@github.com:LucHermitte/lh-dev.git
-git clone git@github.com:LucHermitte/lh-style.git
-git clone git@github.com:LucHermitte/lh-brackets.git
-git clone git@github.com:LucHermitte/vim-refactor.git
-```
+
+    ```
+    git clone git@github.com:LucHermitte/lh-vim-lib.git
+    git clone git@github.com:LucHermitte/lh-tags.git
+    git clone git@github.com:LucHermitte/lh-dev.git
+    git clone git@github.com:LucHermitte/lh-style.git
+    git clone git@github.com:LucHermitte/lh-brackets.git
+    git clone git@github.com:LucHermitte/vim-refactor.git
+
+    # For experimental function extraction
+    git clone git@github.com:LucHermitte/mu-template.git
+    git clone git@github.com:tomtom/stakeholders_vim.git
+    ```
+
   * or with Vundle/NeoBundle (expecting I haven't forgotten anything):
-```vim
-Bundle 'LucHermitte/lh-vim-lib'
-Bundle 'LucHermitte/lh-tags'
-Bundle 'LucHermitte/lh-dev'
-Bundle 'LucHermitte/lh-style'
-Bundle 'LucHermitte/lh-brackets'
-Bundle 'LucHermitte/vim-refactor'
-```
+
+    ```vim
+    Bundle 'LucHermitte/lh-vim-lib'
+    Bundle 'LucHermitte/lh-tags'
+    Bundle 'LucHermitte/lh-dev'
+    Bundle 'LucHermitte/lh-style'
+    Bundle 'LucHermitte/lh-brackets'
+    Bundle 'LucHermitte/vim-refactor'
+
+    " For experimental function extraction
+    Bundle 'LucHermitte/mu-template'
+    Bundle 'tomtom/stakeholders_vim'
+    ```
 
 ## See also
   * Klaus Horsten's tip: [Vim as refactoring tool (with examples in C#)](http://vim.wikia.com/wiki/Vim_as_a_refactoring_tool_and_some_examples_in_C_sharp)
