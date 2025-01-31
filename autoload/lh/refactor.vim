@@ -7,7 +7,7 @@
 " Version:      2.0.0
 let s:k_version = 200
 " Created:      31st Oct 2008
-" Last Update:  09th Mar 2021
+" Last Update:  31st Jan 2025
 "------------------------------------------------------------------------
 " Description:
 "       Language independent refactoring suite
@@ -35,6 +35,7 @@ let s:k_version = 200
 "       v2.0.0 Migrate dependencies from lh-dev to lh-vim-lib/lh-style
 "              Use current indent by default when indenting (typically extract
 "              variable in Python)
+"              Add defaults for variable extraction
 "
 " TODO:
 "       - support <++> as placeholder marks, and automatically convert them to
@@ -515,29 +516,45 @@ endfunction
 
 " # Options                                      {{{2         -----------
 "
-" s:Option(ft, refactoring, name, param)                    {{{3
-function! s:Option(ft, refactorKind, name, param) abort
+function! s:raw_option(ft, refactorKind, name, param, ...) abort
   " let opt = g:refactor_params[a:refactorKind][a:name][a:ft]
   if ! has_key(g:refactor_params, a:refactorKind)
     throw "Unknown ".(a:refactorKind)." refactoring kind"
   endif
   let kind = g:refactor_params[a:refactorKind]
   if !has_key(kind, a:ft)
-    throw (a:refactorKind)." refactoring kind is not supported in ".(a:ft)
+    let msg = (a:refactorKind)." refactoring kind is not supported in ".(a:ft)
+    if a:0 > 0
+      call lh#warning#emit(msg)
+      return a:1
+    endif
+    return lh#option#unset(msg)
   endif
   let familly = kind[a:ft]
   if !has_key(familly, a:name)
     let msg = 'No <'.a:name.'> kind for '.(a:refactorKind).' refactoring in '.(a:ft)
-    throw msg
+    if a:0 > 0
+      call lh#warning#emit(msg)
+      return a:1
+    endif
+    return lh#option#unset(msg)
   endif
   let opt = familly[a:name]
-  if type(opt)==type({}) && has_key(opt, 'execute')
-    let res = lh#function#execute(opt, a:param)
-  else
-    let res = opt
+  return opt
+endfunction
+
+" s:Option(ft, refactoring, name, param, [default])         {{{3
+" Interpret the raw_option found
+function! s:Option(ft, refactorKind, name, param, ...) abort
+  let opt = call('s:raw_option', [a:ft, a:refactorKind, a:name, a:param]+a:000)
+  if lh#option#is_unset(opt)
+    throw opt.__msg
   endif
-  return res
-  " throw "refactor.vim: Please define ``".opt."()''"
+  if type(opt)==type({}) && has_key(opt, 'execute')
+    return function#execute(opt, a:param)
+  else
+    return opt
+  endif
 endfunction
 
 " s:Concat(ft, refactoring, elements, variables)            {{{3
@@ -637,7 +654,7 @@ function! lh#refactor#extract_variable(mayabort, variableName) range abort
   endif
   silent! exe "call lh#refactor#".&ft.'#load()'
   let params      = {'_varname': a:variableName}
-  let lUse        = s:Option(&ft, 'EV', '_use', params)
+  let lUse        = s:Option(&ft, 'EV', '_use', params, ['_varname'])
   " snippets will return text and not list of stuff
   let sUse        = type(lUse) != type([]) ? lUse : s:Concat(&ft, 'EV', lUse, params)
 
@@ -647,7 +664,7 @@ function! lh#refactor#extract_variable(mayabort, variableName) range abort
     " Extract the selected expression into register @a
     exe "normal! gv\"ac".sUse
     let params['_value'] = @a " reuse the same variable as _use may have added some data to params
-    let lDefinition = s:Option(&ft, 'EV', '_definition', params)
+    let lDefinition = s:Option(&ft, 'EV', '_definition', params, lh#refactor#snippet('${_varname} = ${_value}'))
     let sDefinition = type(lDefinition) != type([]) ? lDefinition : s:Concat(&ft, 'EV', lDefinition, params)
     let s:variable = sDefinition
     let s:last_refactor='variable'
