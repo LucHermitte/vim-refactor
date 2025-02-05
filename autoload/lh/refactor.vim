@@ -7,7 +7,7 @@
 " Version:      2.0.0
 let s:k_version = 200
 " Created:      31st Oct 2008
-" Last Update:  31st Jan 2025
+" Last Update:  05th Feb 2025
 "------------------------------------------------------------------------
 " Description:
 "       Language independent refactoring suite
@@ -551,7 +551,7 @@ function! s:Option(ft, refactorKind, name, param, ...) abort
     throw opt.__msg
   endif
   if type(opt)==type({}) && has_key(opt, 'execute')
-    return function#execute(opt, a:param)
+    return lh#function#execute(opt, a:param)
   else
     return opt
   endif
