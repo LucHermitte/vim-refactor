@@ -38,6 +38,9 @@ let s:k_version = 200
 "              Add defaults for variable extraction
 "              Add support for |lambda| in #fill() hook
 "              Improve reindenting for Python-like languages
+"              Corpus of variables can be extended by returning a |Dict| from
+"              #fill() hook. See Python "test_property" hook for
+"              getter-extraction.
 "
 " TODO:
 "       - support <++> as placeholder marks, and automatically convert them to
@@ -585,7 +588,12 @@ function! s:Concat(ft, refactoring, lElements, variables) abort
       endif
       unlet r
     endif
-    let result .= s
+    if type(s) == type({})
+      " We extend variables
+      call extend(a:variables, s)
+    else
+      let result .= s
+    endif
   endfor
   return result
 endfunction
