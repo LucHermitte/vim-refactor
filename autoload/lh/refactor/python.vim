@@ -7,7 +7,7 @@
 " Version:      2.0.0
 let s:k_version = 200
 " Created:      19th Dec 2014
-" Last Update:  05th Jan 2021
+" Last Update:  02nd Sep 2025
 "------------------------------------------------------------------------
 " Description:
 "       Python settings for lh-refactor
@@ -65,6 +65,20 @@ call lh#refactor#fill('EV', 'python', 'assign',       ' = ')
 
 " call lh#refactor#fill('EV_name', 'sh',            '_naming_policy', ['$'])
 " call lh#refactor#fill('EV_name', 'sh', '$',       '$')
+
+" # Extract Getter                               {{{2         -----------
+" Deep copy of the generic definition, in order to customize the result for getters
+call lh#refactor#fill('Eg', 'python', '_definition', ['test_property', 'decl', 'body', 'end'])
+call lh#refactor#fill('Eg', 'python', 'test_property',
+      \                     { p -> {'_is_ppt': 1 == lh#ui#confirm("Shall it be a property?", "&Yes\n&No")} })
+call lh#refactor#fill('Eg', 'python', 'decl',        ['property', 'def', 'opt_type', 'colon'])
+call lh#refactor#fill('Eg', 'python', 'property',    {p -> p._is_ppt ? "@property\n" : ''})
+call lh#refactor#fill('Eg', 'python', 'def',         {p -> printf("def %s(self)", p._is_ppt ? lh#naming#variable(p._name) : p._fname)})
+call lh#refactor#fill('Eg', 'python', 'opt_type',
+      \                     { p -> !empty(p._type) ? ' -> '.. p._type : lh#refactor#placeholder('-> type')} )
+call lh#refactor#fill('Eg', 'python', 'colon',       ":\n" )
+call lh#refactor#fill('Eg', 'python', 'body',        lh#refactor#snippet("return self.${_name}") )
+call lh#refactor#fill('Eg', 'python', 'end',         { _ -> "\n"..lh#marker#txt('')})
 
 "------------------------------------------------------------------------
 " ## Internal functions {{{1
