@@ -1,5 +1,5 @@
 *refactor.txt*          Language independent refactoring helpers (v2.0.0)
-*refactor.vim*          For Vim version 7.x.    Last change: 09th Mar 2021
+*refactor.vim*          For Vim version 7.x.    Last change: 02nd Sep 2025
 
                         By Luc Hermitte
                         hermitte {at} free {dot} fr
@@ -446,6 +446,9 @@ That last parameter is the one that requires the most attention. It can be:
   call lh#refactor#fill('EM', 'vim', 'placeholder', lh#refactor#placeholder(''))
   call lh#refactor#fill('EM', 'vim', 'fsig',
        \ lh#function#bind('lh#refactor#hfunc(v:1_._fname)'))
+- or a |lambda|, e.g. >
+  call lh#refactor#fill('Eg', 'python', 'opt_type',
+       \ { p -> !empty(p._type) ? ' -> '.. p._type : lh#refactor#placeholder('-> type')} )
 <
 
                                                 *refactor-hook-override*

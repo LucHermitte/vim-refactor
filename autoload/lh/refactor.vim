@@ -7,7 +7,7 @@
 " Version:      2.0.0
 let s:k_version = 200
 " Created:      31st Oct 2008
-" Last Update:  05th Feb 2025
+" Last Update:  02nd Sep 2025
 "------------------------------------------------------------------------
 " Description:
 "       Language independent refactoring suite
@@ -36,6 +36,7 @@ let s:k_version = 200
 "              Use current indent by default when indenting (typically extract
 "              variable in Python)
 "              Add defaults for variable extraction
+"              Add support for |lambda| in #fill() hook
 "
 " TODO:
 "       - support <++> as placeholder marks, and automatically convert them to
@@ -539,21 +540,23 @@ function! s:raw_option(ft, refactorKind, name, param, ...) abort
     endif
     return lh#option#unset(msg)
   endif
-  let opt = familly[a:name]
-  return opt
+  let Opt = familly[a:name]
+  return Opt
 endfunction
 
 " s:Option(ft, refactoring, name, param, [default])         {{{3
 " Interpret the raw_option found
 function! s:Option(ft, refactorKind, name, param, ...) abort
-  let opt = call('s:raw_option', [a:ft, a:refactorKind, a:name, a:param]+a:000)
-  if lh#option#is_unset(opt)
-    throw opt.__msg
+  let Opt = call('s:raw_option', [a:ft, a:refactorKind, a:name, a:param]+a:000)
+  if lh#option#is_unset(Opt)
+    throw Opt.__msg
   endif
-  if type(opt)==type({}) && has_key(opt, 'execute')
-    return lh#function#execute(opt, a:param)
+  if type(Opt) == v:t_func
+    return Opt(a:param)
+  elseif type(Opt)==type({}) && has_key(Opt, 'execute')
+    return lh#function#execute(Opt, a:param)
   else
-    return opt
+    return Opt
   endif
 endfunction
 
@@ -759,9 +762,12 @@ function! lh#refactor#extract_getter() abort
     " Prepare the function body
     let params    = {
           \ '_ppt_name': name,
-          \ '_name': attribute.name, '_type': attribute.type,
+          \ '_name': attribute.name,
+          \ '_type': attribute.type,
           \ '_static': (has_key(attribute,'static') && attribute.static ? 'static ' : ''),
-          \ '_fname': getter_name, '_void': ''}
+          \ '_fname': getter_name,
+          \ '_void': ''
+          \ }
     if has_key(attribute, 'visibility')
       let params['_visibility'] = attribute.visibility.' '
     endif
