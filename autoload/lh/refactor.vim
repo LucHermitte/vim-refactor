@@ -37,6 +37,7 @@ let s:k_version = 200
 "              variable in Python)
 "              Add defaults for variable extraction
 "              Add support for |lambda| in #fill() hook
+"              Improve reindenting for Python-like languages
 "
 " TODO:
 "       - support <++> as placeholder marks, and automatically convert them to
@@ -432,7 +433,7 @@ call lh#refactor#fill('EM', 'pascal', 'placeholder', lh#refactor#placeholder('')
 " # Extract Type                                 {{{2         -----------
 
 " # Extract Getter                               {{{2         -----------
-" Generic definition for C++ inspired OO langages           {{{3         -----------
+" Generic definition for C++ inspired OO languages          {{{3         -----------
 " no _use in that case
 " Options: (b|g):[cpp_]refactor_getter_open, (b|g):[cpp_]refactor_getter_close, and (b|g):[cpp_]refactor_getter_doc, e.g.
 LetIfUndef g:java_refactor_getter_open "\ {\n"
@@ -454,7 +455,7 @@ call lh#refactor#fill('Eg', '_oo_c_', 'fsig',         lh#function#bind('lh#refac
 call lh#refactor#fill('Eg', '_oo_c_', 'body',         ['open', 'return', '_name', 'eol', 'close'])
 
 " # Extract Setter                               {{{2         -----------
-" Generic definition for C++ inspired OO langages           {{{3         -----------
+" Generic definition for C++ inspired OO languages          {{{3         -----------
 " no _use in that case
 " Options: (b|g):[cpp_]refactor_setter_open, (b|g):[cpp_]refactor_setter_close, and (b|g):[cpp_]refactor_setter_doc, e.g.
 LetIfUndef g:java_refactor_setter_open "\ {\n"
@@ -901,9 +902,11 @@ endfunction
 " General functions                              {{{2         -----------
 " lh#refactor#put_extracted_stuff(bang,what)                {{{3
 function! lh#refactor#put_extracted_stuff(bang, what) abort
-  " With some languages (e.g., the indenting needs to be forced)
+  " With some languages (e.g. Python, the indenting needs to be forced)
   let indent = indent('.')
-  let what = repeat(' ', indent) . a:what
+  let spaces = repeat(' ', indent)
+  " Currently, we have a string and not a list of string
+  let what = join(map(split(a:what, "\n"), 'spaces.v:val'), "\n")
   " Put the function
   if "!" == a:bang
     silent! put!=what
